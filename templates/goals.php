@@ -3,11 +3,14 @@ $pageTitle = 'Správa cílů';
 
 /** @var GoalRepository $goalRepo */
 /** @var UserRepository $userRepo */
+/** @var DepartmentRepository $departmentRepo */ // Added for permission check
 /** @var Auth $auth */
+
+require_once __DIR__ . '/../src/Helpers/GoalPermissions.php';
 
 // Data for the view
 $goals = $goalRepo->findAll();
-$users = $userRepo->findAll(); // For assignee dropdown
+$allUsers = $userRepo->findAll(); // All users for permission checking
 
 $editingGoal = null;
 if (isset($_GET['edit_id'])) {
@@ -19,9 +22,36 @@ $statusOptions = [
     'in_progress' => 'V řešení',
     'completed' => 'Hotovo'
 ];
+
+// Filter users for the assignee dropdown based on permissions
+$uploaderId = $auth->id();
+$assignableUsers = [];
+foreach ($allUsers as $user) {
+    if (is_ancestor_manager($uploaderId, $user['id'], $userRepo, $departmentRepo)) {
+        $assignableUsers[] = $user;
+    }
+}
+// If editing a goal, ensure the current assignee is in the list even if no longer assignable
+if ($editingGoal) {
+    $currentAssigneeId = $editingGoal['assignee_id'];
+    $isCurrentAssigneeInList = false;
+    foreach ($assignableUsers as $au) {
+        if ($au['id'] == $currentAssigneeId) {
+            $isCurrentAssigneeInList = true;
+            break;
+        }
+    }
+    if (!$isCurrentAssigneeInList) {
+        $assigneeUser = $userRepo->find($currentAssigneeId);
+        if ($assigneeUser) {
+            $assignableUsers[] = $assigneeUser; // Add current assignee
+        }
+    }
+}
 ?>
 
-<h1>Správa cílů</h1>
+<h1>Strategické cíle</h1>
+<p class="description">Zde zadáváte strategické cíle, které manažeři přiřazují podřízeným. Jsou to dlouhodobější záměry, které podřízený aktualizuje s ohledem na celkový progres.</p>
 
 <?php if (isset($_SESSION['error_message'])): ?>
     <div class="pico-color-red-500" role="alert">
@@ -32,7 +62,7 @@ $statusOptions = [
 
 <article>
     <form method="POST" action="index.php?page=goals">
-        <h2><?= $editingGoal ? 'Upravit cíl' : 'Vytvořit nový cíl' ?></h2>
+        <h2><?= $editingGoal ? 'Upravit strategický cíl' : 'Vytvořit nový strategický cíl' ?></h2>
 
         <input type="hidden" name="action" value="save_goal">
         <?php if ($editingGoal): ?>
@@ -40,7 +70,7 @@ $statusOptions = [
         <?php endif; ?>
 
         <label for="title">
-            Název cíle
+            Název strategického cíle
             <input type="text" id="title" name="title" value="<?= htmlspecialchars($editingGoal['title'] ?? '') ?>" required>
         </label>
 
@@ -54,7 +84,7 @@ $statusOptions = [
                 Řešitel
                 <select id="assignee_id" name="assignee_id" required>
                     <option value="">-- Vyberte řešitele --</option>
-                    <?php foreach ($users as $user): ?>
+                    <?php foreach ($assignableUsers as $user): ?>
                         <option value="<?= $user['id'] ?>" <?= (($editingGoal['assignee_id'] ?? null) == $user['id']) ? 'selected' : '' ?>>
                             <?= htmlspecialchars($user['full_name']) ?>
                         </option>

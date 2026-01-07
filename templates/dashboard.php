@@ -2,6 +2,7 @@
 $pageTitle = 'Dashboard';
 
 /** @var DepartmentRepository $departmentRepo */
+/** @var RecognitionRepository $recognitionRepo */
 /** @var PDO $pdo */
 $pdo = Database::getInstance();
 
@@ -31,6 +32,12 @@ foreach ($users as $userId => $user) {
     if (!isset($assignedUserIds[$userId])) {
         $unassignedUsers[] = $user;
     }
+}
+
+// Fetch recent recognitions (e.g., 5 most recent)
+$recentRecognitions = $recognitionRepo->findAll();
+if (count($recentRecognitions) > 5) {
+    $recentRecognitions = array_slice($recentRecognitions, 0, 5);
 }
 
 // --- HTML & CSS Rendering ---
@@ -156,6 +163,26 @@ foreach ($departments as $dept) {
         <ul>
             <?php foreach ($unassignedUsers as $user): ?>
                 <li><?= htmlspecialchars($user['full_name']) ?></li>
+            <?php endforeach; ?>
+        </ul>
+    <?php endif; ?>
+</article>
+
+<hr>
+
+<h2>Poslední pochvaly</h2>
+<article>
+    <?php if (empty($recentRecognitions)): ?>
+        <p>Zatím nebyly uděleny žádné pochvaly.</p>
+    <?php else: ?>
+        <ul>
+            <?php foreach ($recentRecognitions as $recognition): ?>
+                <li>
+                    <?= htmlspecialchars($recognition['message']) ?> od
+                    <strong><?= htmlspecialchars($recognition['giver_name']) ?></strong> pro
+                    <strong><?= htmlspecialchars($recognition['receiver_name']) ?></strong>
+                    (<?= date('j. n. Y', strtotime($recognition['created_at'])) ?>)
+                </li>
             <?php endforeach; ?>
         </ul>
     <?php endif; ?>
