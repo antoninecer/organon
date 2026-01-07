@@ -13,6 +13,14 @@ $editingRecognition = null;
 if (isset($_GET['edit_id'])) {
     $editingRecognition = $recognitionRepo->find((int)$_GET['edit_id']);
 }
+
+// Determine pre-selected receiver ID (from GET parameter or editing recognition)
+$preselectedReceiverId = null;
+if (isset($_GET['receiver_id'])) {
+    $preselectedReceiverId = (int)$_GET['receiver_id'];
+} elseif ($editingRecognition) {
+    $preselectedReceiverId = $editingRecognition['receiver_id'];
+}
 ?>
 
 <h1>Správa pochval</h1>
@@ -39,7 +47,7 @@ if (isset($_GET['edit_id'])) {
                 <select id="receiver_id" name="receiver_id" required>
                     <option value="">-- Vyberte příjemce --</option>
                     <?php foreach ($users as $user): ?>
-                        <option value="<?= $user['id'] ?>" <?= (($editingRecognition['receiver_id'] ?? null) == $user['id']) ? 'selected' : '' ?>>
+                        <option value="<?= $user['id'] ?>" <?= ($preselectedReceiverId == $user['id']) ? 'selected' : '' ?>>
                             <?= htmlspecialchars($user['full_name']) ?>
                         </option>
                     <?php endforeach; ?>

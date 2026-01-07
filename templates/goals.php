@@ -17,6 +17,14 @@ if (isset($_GET['edit_id'])) {
     $editingGoal = $goalRepo->find((int)$_GET['edit_id']);
 }
 
+// Determine pre-selected assignee ID (from GET parameter or editing goal)
+$preselectedAssigneeId = null;
+if (isset($_GET['assignee_id'])) {
+    $preselectedAssigneeId = (int)$_GET['assignee_id'];
+} elseif ($editingGoal) {
+    $preselectedAssigneeId = $editingGoal['assignee_id'];
+}
+
 $statusOptions = [
     'new' => 'Nový',
     'in_progress' => 'V řešení',
@@ -31,21 +39,11 @@ foreach ($allUsers as $user) {
         $assignableUsers[] = $user;
     }
 }
-// If editing a goal, ensure the current assignee is in the list even if no longer assignable
-if ($editingGoal) {
-    $currentAssigneeId = $editingGoal['assignee_id'];
-    $isCurrentAssigneeInList = false;
-    foreach ($assignableUsers as $au) {
-        if ($au['id'] == $currentAssigneeId) {
-            $isCurrentAssigneeInList = true;
-            break;
-        }
-    }
-    if (!$isCurrentAssigneeInList) {
-        $assigneeUser = $userRepo->find($currentAssigneeId);
-        if ($assigneeUser) {
-            $assignableUsers[] = $assigneeUser; // Add current assignee
-        }
+// If editing a goal or creating for a preselected assignee, ensure that user is in the assignable list for display
+if ($preselectedAssigneeId && !in_array($preselectedAssigneeId, array_column($assignableUsers, 'id'))) {
+    $userToPreselect = $userRepo->find($preselectedAssigneeId);
+    if ($userToPreselect) {
+        $assignableUsers[] = $userToPreselect; // Add for display purposes
     }
 }
 ?>
@@ -80,12 +78,56 @@ if ($editingGoal) {
         </label>
 
         <div class="grid">
+            <label for="metric_type">
+                Typ metriky
+                <select id="metric_type" name="metric_type" required>
+                    <option value="number" <?= (($editingGoal['metric_type'] ?? 'number') == 'number') ? 'selected' : '' ?>>Číslo</option>
+                    <option value="percentage" <?= (($editingGoal['metric_type'] ?? '') == 'percentage') ? 'selected' : '' ?>>Procenta</option>
+                    <option value="boolean" <?= (($editingGoal['metric_type'] ?? '') == 'boolean') ? 'selected' : '' ?>>Ano/Ne</option>
+                    <option value="scale" <?= (($editingGoal['metric_type'] ?? '') == 'scale') ? 'selected' : '' ?>>Škála</option>
+                </select>
+                <small>Definuje, jak se cíl měří (např. absolutní číslo, procenta, ano/ne, na škále).</small>
+            </label>
+            <label for="target_value">
+                Cílová hodnota
+                <input type="number" step="any" id="target_value" name="target_value" value="<?= htmlspecialchars($editingGoal['target_value'] ?? '') ?>">
+                <small>Hodnota, které má být dosaženo (např. 100 pro číslo, 80.5 pro procenta). Může být prázdné pro metodu "Škála".</small>
+            </label>
+        </div>
+
+        <div class="grid">
+            <label for="weight">
+                Váha (1-5)
+                <input type="number" min="1" max="5" id="weight" name="weight" value="<?= htmlspecialchars($editingGoal['weight'] ?? 1) ?>">
+                <small>Důležitost cíle pro celkové hodnocení (1-nejmenší, 5-největší).</small>
+            </label>
+            <label for="evaluation_rule">
+                Pravidlo hodnocení
+                <select id="evaluation_rule" name="evaluation_rule" required>
+                    <option value=">=" <?= (($editingGoal['evaluation_rule'] ?? '>=') == '>=') ? 'selected' : '' ?>>Větší nebo rovno (>=)</option>
+                    <option value="<=" <?= (($editingGoal['evaluation_rule'] ?? '') == '<=') ? 'selected' : '' ?>>Menší nebo rovno (<=)</option>
+                    <option value="exact" <?= (($editingGoal['evaluation_rule'] ?? '') == 'exact') ? 'selected' : '' ?>>Přesná hodnota</option>
+                </select>
+                <small>Logika pro vyhodnocení plnění cíle vůči cílové hodnotě.</small>
+            </label>
+            <label for="data_source">
+                Zdroj dat
+                <select id="data_source" name="data_source" required>
+                    <option value="manual" <?= (($editingGoal['data_source'] ?? 'manual') == 'manual') ? 'selected' : '' ?>>Manuálně</option>
+                    <option value="api" <?= (($editingGoal['data_source'] ?? '') == 'api') ? 'selected' : '' ?>>API</option>
+                    <option value="system" <?= (($editingGoal['data_source'] ?? '') == 'system') ? 'selected' : '' ?>>Systém</option>
+                </select>
+                <small>Odkud se získává aktuální hodnota pro reporting (manuální zadání, automaticky z API, z interního systému).</small>
+            </label>
+        </div>
+
+        <div class="grid">
             <label for="assignee_id">
                 Řešitel
                 <select id="assignee_id" name="assignee_id" required>
                     <option value="">-- Vyberte řešitele --</option>
                     <?php foreach ($assignableUsers as $user): ?>
-                        <option value="<?= $user['id'] ?>" <?= (($editingGoal['assignee_id'] ?? null) == $user['id']) ? 'selected' : '' ?>>
+                        <option value="<?= $user['id'] ?>" <?= ($preselectedAssigneeId == $user['id']) ? 'selected' : '' ?>>
                             <?= htmlspecialchars($user['full_name']) ?>
                         </option>
                     <?php endforeach; ?>
@@ -127,13 +169,14 @@ if ($editingGoal) {
                 <th>Zadavatel</th>
                 <th>Termín</th>
                 <th>Status</th>
+                <th>Reporty</th>
                 <th>Akce</th>
             </tr>
         </thead>
         <tbody>
             <?php if (empty($goals)): ?>
                 <tr>
-                    <td colspan="6">Zatím nebyly zadány žádné cíle.</td>
+                    <td colspan="7">Zatím nebyly zadány žádné cíle.</td>
                 </tr>
             <?php else: ?>
                 <?php foreach ($goals as $goal): ?>
@@ -146,6 +189,7 @@ if ($editingGoal) {
                             <span class="pico-badge-dot" style="background-color: <?= match($goal['status']) { 'new' => '#007bff', 'in_progress' => '#ffc107', 'completed' => '#28a745' } ?>;"></span>
                             <?= $statusOptions[$goal['status']] ?? 'Neznámý' ?>
                         </td>
+                        <td><a href="index.php?page=goal_report&goal_id=<?= $goal['id'] ?>" role="button" class="contrast outline">Reporty</a></td>
                         <td>
                             <div style="display: flex; gap: 0.5rem; align-items: center;">
                                 <a href="index.php?page=goals&edit_id=<?= $goal['id'] ?>" role="button" class="contrast outline">Edit</a>

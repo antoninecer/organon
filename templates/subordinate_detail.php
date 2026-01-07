@@ -34,9 +34,15 @@ $actionItemStatusOptions = [
 
 <h1>Detail podřízeného: <?= htmlspecialchars($subordinateUser['full_name']) ?></h1>
 
+<div class="grid">
+    <a href="index.php?page=goals&assignee_id=<?= $subordinateId ?>" role="button">Přidat cíl</a>
+    <a href="index.php?page=action_items&owner_id=<?= $subordinateId ?>" role="button" class="secondary">Přidat úkol</a>
+    <a href="index.php?page=recognitions&receiver_id=<?= $subordinateId ?>" role="button" class="contrast outline">Udělit pochvalu</a>
+</div>
+
 <p>
-    **Email:** <?= htmlspecialchars($subordinateUser['email']) ?><br>
-    **Uživatelské jméno:** <?= htmlspecialchars($subordinateUser['username']) ?>
+    **Email:** <?= htmlspecialchars($subordinateUser['email'] ?? 'N/A') ?><br>
+    **Uživatelské jméno:** <?= htmlspecialchars($subordinateUser['username'] ?? 'N/A') ?>
 </p>
 
 <hr>

@@ -51,9 +51,30 @@ try {
             manager_id INTEGER,
             status TEXT NOT NULL DEFAULT 'new',
             due_date DATE,
+            -- New columns for enhanced goal model
+            metric_type TEXT DEFAULT 'number', -- e.g., 'number', 'percentage', 'boolean', 'scale'
+            target_value REAL,
+            weight INTEGER DEFAULT 1,
+            evaluation_rule TEXT DEFAULT '>=', -- e.g., '>=', '<=', 'between', 'exact'
+            data_source TEXT DEFAULT 'manual', -- e.g., 'manual', 'api', 'system'
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             FOREIGN KEY (assignee_id) REFERENCES users(id) ON DELETE CASCADE,
             FOREIGN KEY (manager_id) REFERENCES users(id) ON DELETE SET NULL
+        );",
+
+        // Goal Reports table (for weekly/monthly progress updates)
+        "CREATE TABLE IF NOT EXISTS goal_reports (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            goal_id INTEGER NOT NULL,
+            report_date DATE NOT NULL,
+            value REAL, -- The reported value for the metric
+            comment TEXT, -- proč (why) - for objective reasons
+            plan_next_week TEXT, -- co udělám příští týden
+            risk_level TEXT DEFAULT 'low', -- 'low', 'medium', 'high'
+            reported_by_id INTEGER NOT NULL, -- Who submitted this report
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (goal_id) REFERENCES goals(id) ON DELETE CASCADE,
+            FOREIGN KEY (reported_by_id) REFERENCES users(id) ON DELETE CASCADE
         );",
 
         // Action items from 1:1s or meetings
@@ -77,6 +98,18 @@ try {
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             FOREIGN KEY (giver_id) REFERENCES users(id) ON DELETE CASCADE,
             FOREIGN KEY (receiver_id) REFERENCES users(id) ON DELETE CASCADE
+        );",
+
+        // One-on-One Notes table
+        "CREATE TABLE IF NOT EXISTS one_on_one_notes (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            manager_id INTEGER NOT NULL,
+            subordinate_id INTEGER NOT NULL,
+            note_date DATE NOT NULL,
+            content TEXT NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (manager_id) REFERENCES users(id) ON DELETE CASCADE,
+            FOREIGN KEY (subordinate_id) REFERENCES users(id) ON DELETE CASCADE
         );"
     ];
 

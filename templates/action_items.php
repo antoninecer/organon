@@ -17,6 +17,14 @@ if (isset($_GET['edit_id'])) {
     $editingActionItem = $actionItemRepo->find((int)$_GET['edit_id']);
 }
 
+// Determine pre-selected owner ID (from GET parameter or editing action item)
+$preselectedOwnerId = null;
+if (isset($_GET['owner_id'])) {
+    $preselectedOwnerId = (int)$_GET['owner_id'];
+} elseif ($editingActionItem) {
+    $preselectedOwnerId = $editingActionItem['owner_id'];
+}
+
 $statusOptions = [
     'new' => 'Nový',
     'in_progress' => 'V řešení',
@@ -31,21 +39,11 @@ foreach ($allUsers as $user) {
         $assignableUsers[] = $user;
     }
 }
-// If editing an action item, ensure the current owner is in the list even if no longer assignable
-if ($editingActionItem) {
-    $currentOwnerId = $editingActionItem['owner_id'];
-    $isCurrentOwnerInList = false;
-    foreach ($assignableUsers as $au) {
-        if ($au['id'] == $currentOwnerId) {
-            $isCurrentOwnerInList = true;
-            break;
-        }
-    }
-    if (!$isCurrentOwnerInList) {
-        $ownerUser = $userRepo->find($currentOwnerId);
-        if ($ownerUser) {
-            $assignableUsers[] = $ownerUser; // Add current owner
-        }
+// If editing an action item or creating for a preselected owner, ensure that user is in the assignable list for display
+if ($preselectedOwnerId && !in_array($preselectedOwnerId, array_column($assignableUsers, 'id'))) {
+    $userToPreselect = $userRepo->find($preselectedOwnerId);
+    if ($userToPreselect) {
+        $assignableUsers[] = $userToPreselect; // Add for display purposes
     }
 }
 ?>
@@ -85,7 +83,7 @@ if ($editingActionItem) {
                 <select id="owner_id" name="owner_id" required>
                     <option value="">-- Vyberte majitele --</option>
                     <?php foreach ($assignableUsers as $user): ?>
-                        <option value="<?= $user['id'] ?>" <?= (($editingActionItem['owner_id'] ?? null) == $user['id']) ? 'selected' : '' ?>>
+                        <option value="<?= $user['id'] ?>" <?= ($preselectedOwnerId == $user['id']) ? 'selected' : '' ?>>
                             <?= htmlspecialchars($user['full_name']) ?>
                         </option>
                     <?php endforeach; ?>

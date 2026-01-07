@@ -30,7 +30,7 @@ try {
 
     $usersData = [
         // CEO
-        ['username' => 'alice', 'email' => 'alice@firma.cz', 'full_name' => 'Alice Vzorová', 'password' => 'password', 'department' => 'Vedení firmy', 'is_manager_of' => null],
+        ['username' => 'alice', 'email' => 'alice@firma.cz', 'full_name' => 'Alice Vzorová', 'password' => 'password', 'department' => 'Vedení firmy', 'is_manager_of' => 'Vedení firmy'],
         // Managers
         ['username' => 'bara', 'email' => 'bara@firma.cz', 'full_name' => 'Bára Marketingová', 'password' => 'password', 'department' => 'Marketing', 'is_manager_of' => 'Marketing'],
         ['username' => 'cyril', 'email' => 'cyril@firma.cz', 'full_name' => 'Cyril Prodejce', 'password' => 'password', 'department' => 'Prodej', 'is_manager_of' => 'Prodej'],
@@ -87,16 +87,21 @@ try {
     $stmt = $pdo->prepare("INSERT INTO user_departments (user_id, department_id) VALUES (?, ?)");
     foreach ($usersData as $ud) {
         $userId = $userIds[$ud['username']];
-        $deptId = $departmentIds[$ud['department']];
-        $stmt->execute([$userId, $deptId]);
-        echo "  - Linked {$ud['full_name']} to {$ud['department']}\n";
+        // Only link user to department if department is specified
+        if (!empty($ud['department'])) {
+            $deptId = $departmentIds[$ud['department']];
+            $stmt->execute([$userId, $deptId]);
+            echo "  - Linked {$ud['full_name']} to {$ud['department']}\n";
 
-        // If user is a manager (and not CEO), link them to the parent department as well
-        if ($ud['is_manager_of'] && $ud['username'] !== 'alice') {
-            $parentDeptName = $departmentsData[$ud['department']]['parent'];
-            $parentDeptId = $departmentIds[$parentDeptName];
-            $stmt->execute([$userId, $parentDeptId]);
-            echo "  - Linked manager {$ud['full_name']} to parent department {$parentDeptName}\n";
+            // If user is a manager (and not CEO), link them to the parent department as well
+            if ($ud['is_manager_of'] && $ud['username'] !== 'alice') {
+                $parentDeptName = $departmentsData[$ud['department']]['parent'];
+                $parentDeptId = $departmentIds[$parentDeptName];
+                $stmt->execute([$userId, $parentDeptId]);
+                echo "  - Linked manager {$ud['full_name']} to parent department {$parentDeptName}\n";
+            }
+        } else {
+            echo "  - User {$ud['full_name']} is not assigned to a department.\n";
         }
     }
     echo "[SUCCESS] Users linked.\n";

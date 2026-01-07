@@ -74,6 +74,59 @@ Logickým pokračováním je implementace klíčových manažerských funkcí dl
 2.  **Implementovat správu úkolů (CRUD):** Vytvořit UI a backend pro sledování akčních kroků a dohod.
 3.  **Implementovat pochvaly:** Vytvořit UI a backend pro dávání a zobrazování uznání.
 
+---
+
+## 7. Stav po 1. dni vývoje (dne 2026-01-07 21:00:00)
+
+**Dosažený pokrok:**
+
+*   **Správa uživatelů a oddělení:** Původní CRUD rozšířen o email, funkční přiřazení uživatelů k oddělením a správu manažerů. Implementována hierarchická logika pro oprávnění.
+*   **Organizační diagram:** Implementována vizualizace organizační struktury formou stylizovaných HTML karet na Dashboardu.
+*   **Správa cílů (Goals):** Plně funkční CRUD operace pro cíle. Implementován hierarchický model oprávnění (nadřízený -> podřízený, admin override, self-assignment). UI filtruje rozbalovací seznam řešitelů.
+*   **Správa úkolů (Action Items):** Plně funkční CRUD operace pro úkoly. Stejný hierarchický model oprávnění jako u cílů. UI filtruje rozbalovací seznam majitelů.
+*   **Pochvaly (Recognitions):** Plně funkční CRUD operace pro pochvaly. Otevřený model oprávnění (každý každému), s omezením editace/mazání na zadavatele.
+*   **Dashboard rozšíření:** Zobrazení posledních pochval na Dashboardu.
+*   **"Můj tým" a "Detail podřízeného":** Implementovány stránky pro manažery pro přehled a detailní zobrazení cílů, úkolů a pochval pro své podřízené.
+*   **Rozlišení Cílů vs. Úkolů v UI:** Upraveny popisky na stránkách "Cíle" a "Úkoly" pro jasnější rozlišení strategických cílů a taktických úkolů/dohod.
+
+**Další kroky dle `upresneni.txt` a diskuse (priorita pro další den vývoje):**
+
+Abychom podpořili efektivní hodnocení a reporting manažerských interakcí, je klíčové:
+
+1.  **Rozšíření modelu Cílů:** Doplnit datový model cíle o `metriky` (typ, cílová hodnota), `váhu`, `pravidlo vyhodnocení` a `zdroj dat`.
+2.  **Implementace Reportingu k Cílům:** Vytvořit entitu `Report entry` pro pravidelné (např. týdenní) záznamy o plnění cílů, včetně hodnot a komentářů "proč" (pro zaznamenání objektivních důvodů).
+3.  **Implementace modulu 1:1 rozhovorů:** Vytvořit systém pro plánování a záznamy z 1:1 schůzek, včetně agendy, překážek, rozvoje a závazků (kde se budou propojovat úkoly).
+
+---
+
+## 8. Stav po následném vývoji (dne 2026-01-08 21:30:00)
+
+**Dosažený pokrok:**
+
+*   **Rozšířený model cílů:**
+    *   Rozšířena struktura tabulky `goals` o `metric_type`, `target_value`, `weight`, `evaluation_rule`, a `data_source`.
+    *   Aktualizován `GoalRepository` a `templates/goals.php` (formulář včetně vysvětlivek) pro správu těchto nových atributů cíle.
+    *   Integrována nová pole do akce `save_goal` v `public/index.php`.
+*   **Modul pro reporting cílů:**
+    *   Implementována tabulka `goal_reports` v `setup.php` pro sledování průběhu (hodnota, komentář, plán, riziko).
+    *   Vytvořen `GoalReportRepository` pro CRUD operace s reporty.
+    *   Přidána dedikovaná stránka `templates/goal_report.php` pro zobrazení a odesílání reportů.
+    *   Integrován `GoalReportRepository` a akce (`save_goal_report`, `delete_goal_report`) do `public/index.php`.
+    *   Přidán odkaz "Reporty" k cílům v `templates/goals.php`.
+*   **Vylepšení interakce s podřízenými:**
+    *   Přidána tlačítka rychlých akcí ("Přidat cíl", "Přidat úkol", "Udělit pochvalu") na `subordinate_detail.php` pro zefektivnění řízení během 1:1 schůzek. Tyto tlačítka automaticky předvyplňují ID cílového uživatele.
+    *   Aktualizovány formuláře cílů, úkolů a pochval tak, aby přijímaly předvyplněná ID uživatelů z GET parametrů.
+*   **Příprava pro poznámky z 1:1:**
+    *   Přidána definice tabulky `one_on_one_notes` do `setup.php`, což připravuje půdu pro strukturované poznámky ze schůzek 1:1.
+
+**Další kroky dle `upresneni.txt` (priorita pro další den vývoje):**
+
+Nyní je dokončena fáze rozšíření modelu cílů a implementace reportingu. Dalším logickým krokem je:
+
+1.  **Dokončení modulu 1:1 rozhovorů:** Implementovat `OneOnOneNoteRepository`, akce pro správu poznámek v `public/index.php` a UI pro přidávání/zobrazování poznámek na stránce `subordinate_detail.php`. Tím získáme strukturovaný prostor pro plánování a záznamy z 1:1 schůzek.
+
+---
+
 pojdme udelat imaginarni organizaci se 3mi oddelenimi dohromady 10 lidi i s CEO 
 CEO (1)
 

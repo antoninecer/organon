@@ -13,6 +13,7 @@ require_once __DIR__ . '/../src/Repository/UserRepository.php';
 require_once __DIR__ . '/../src/Repository/GoalRepository.php';
 require_once __DIR__ . '/../src/Repository/ActionItemRepository.php';
 require_once __DIR__ . '/../src/Repository/RecognitionRepository.php';
+require_once __DIR__ . '/../src/Repository/GoalReportRepository.php';
 require_once __DIR__ . '/../src/Helpers/GoalPermissions.php';
 
 $auth = new Auth();
@@ -21,6 +22,7 @@ $userRepo = new UserRepository();
 $goalRepo = new GoalRepository();
 $actionItemRepo = new ActionItemRepository();
 $recognitionRepo = new RecognitionRepository();
+$goalReportRepo = new GoalReportRepository();
 
 // --- Action Handling ---
 $action = $_POST['action'] ?? $_GET['action'] ?? null;
@@ -112,6 +114,11 @@ if ($action === 'save_goal' && $_SERVER['REQUEST_METHOD'] === 'POST') {
         'assignee_id' => $assigneeId,
         'status' => $_POST['status'],
         'due_date' => $_POST['due_date'],
+        'metric_type' => $_POST['metric_type'],
+        'target_value' => !empty($_POST['target_value']) ? (float)$_POST['target_value'] : null,
+        'weight' => (int)$_POST['weight'],
+        'evaluation_rule' => $_POST['evaluation_rule'],
+        'data_source' => $_POST['data_source'],
         'manager_id' => $uploaderId // The manager is the person creating the goal
     ];
     $goalRepo->save($goalData);
@@ -177,6 +184,32 @@ if ($action === 'delete_recognition' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     exit;
 }
 
+// Goal Report Actions
+if ($action === 'save_goal_report' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    $goalId = (int)$_POST['goal_id'];
+    $reportData = [
+        'id' => !empty($_POST['id']) ? (int)$_POST['id'] : null,
+        'goal_id' => $goalId,
+        'report_date' => $_POST['report_date'],
+        'value' => !empty($_POST['value']) ? (float)$_POST['value'] : null,
+        'comment' => $_POST['comment'],
+        'plan_next_week' => $_POST['plan_next_week'],
+        'risk_level' => $_POST['risk_level'],
+        'reported_by_id' => $auth->id() // Who submitted this report
+    ];
+    $goalReportRepo->save($reportData);
+    header('Location: index.php?page=goal_report&goal_id=' . $goalId);
+    exit;
+}
+
+if ($action === 'delete_goal_report' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    $goalId = (int)$_POST['goal_id'];
+    $id = (int)$_POST['id'];
+    $goalReportRepo->delete($id);
+    header('Location: index.php?page=goal_report&goal_id=' . $goalId);
+    exit;
+}
+
 
 // --- Page Routing & Security ---
 $page = $_GET['page'] ?? 'dashboard';
@@ -212,6 +245,10 @@ switch ($page) {
 
     case 'goals':
         include __DIR__ . '/../templates/goals.php';
+        break;
+
+    case 'goal_report':
+        include __DIR__ . '/../templates/goal_report.php';
         break;
 
     case 'action_items':

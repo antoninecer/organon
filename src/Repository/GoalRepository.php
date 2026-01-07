@@ -53,7 +53,7 @@ class GoalRepository
 
         if ($id) {
             // Update
-            $sql = "UPDATE goals SET title = ?, description = ?, assignee_id = ?, status = ?, due_date = ? WHERE id = ?";
+            $sql = "UPDATE goals SET title = ?, description = ?, assignee_id = ?, status = ?, due_date = ?, metric_type = ?, target_value = ?, weight = ?, evaluation_rule = ?, data_source = ? WHERE id = ?";
             $stmt = $this->pdo->prepare($sql);
             return $stmt->execute([
                 $data['title'],
@@ -61,11 +61,16 @@ class GoalRepository
                 $data['assignee_id'],
                 $data['status'],
                 empty($data['due_date']) ? null : $data['due_date'],
+                $data['metric_type'] ?? 'number',
+                $data['target_value'] ?? null,
+                $data['weight'] ?? 1,
+                $data['evaluation_rule'] ?? '>=',
+                $data['data_source'] ?? 'manual',
                 $id
             ]);
         } else {
             // Create
-            $sql = "INSERT INTO goals (title, description, assignee_id, manager_id, status, due_date) VALUES (?, ?, ?, ?, ?, ?)";
+            $sql = "INSERT INTO goals (title, description, assignee_id, manager_id, status, due_date, metric_type, target_value, weight, evaluation_rule, data_source) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
             $stmt = $this->pdo->prepare($sql);
             return $stmt->execute([
                 $data['title'],
@@ -73,7 +78,12 @@ class GoalRepository
                 $data['assignee_id'],
                 $data['manager_id'], // Set only on creation
                 $data['status'],
-                empty($data['due_date']) ? null : $data['due_date']
+                empty($data['due_date']) ? null : $data['due_date'],
+                $data['metric_type'] ?? 'number',
+                $data['target_value'] ?? null,
+                $data['weight'] ?? 1,
+                $data['evaluation_rule'] ?? '>=',
+                $data['data_source'] ?? 'manual'
             ]);
         }
     }
