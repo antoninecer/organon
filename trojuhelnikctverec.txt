@@ -1,0 +1,410 @@
+1) Účel a smysl systému
+1.1 Cíl produktu
+
+Vybudovat jednotný „organizační operační systém“, který:
+
+sjednotí jazyk řízení (co je cíl, co je výkon, co je dohoda, co je rozhodnutí),
+
+zmenší chaos (méně ad-hoc výkřiků, více rytmu),
+
+zvýší pravdivost řízení (reporting z dat, ne z dojmů),
+
+podpoří férovost (odměny navázané na transparentní pravidla),
+
+umožní kaskádu od strategie po denní práci.
+
+1.2 Rozsah
+
+Eviduje a řídí: cíle, metriky, reporting, rituály vedení, překážky, rozhodnutí, rozvoj a odměny.
+
+Integruje data z interních systémů (HRIS, IAM, tiketovací, projektové, CRM, monitoring, finance…).
+
+Poskytuje role-based pohledy pro CEO, manažery i jednotlivce.
+
+1.3 Co systém není
+
+Není to nový Jira/ServiceNow/CRM.
+
+Není to nástroj na mikromanagement „po pěti minutách“.
+
+Není to veřejná „tabule hanby“ – musí podporovat kulturu důvěry.
+
+2) Stakeholdeři a role
+2.1 Role v systému
+
+CEO / Board – strategická kaskáda, zdraví organizace, rizika, trendy.
+
+Executive / Director / Head – cíle domén, kapacity, překážky, eskalace.
+
+Manager / Team Lead – vedení lidí (rituály), výkon týmu, dohody, odstranění blokérů.
+
+Individual Contributor – vlastní cíle, progres, překážky, dohody z 1:1, rozvoj.
+
+HR / People Ops – rámce hodnocení, kompetence, cykly, odměny (role-based).
+
+Finance – pravidla bonusů, rozpočty, schvalování (omezený přístup).
+
+Admin (System + Org) – konfigurace, konektory, oprávnění, audit.
+
+Auditor / Compliance – read-only auditní přístup (striktně omezeno).
+
+Integrator (API / ETL) – správa konektorů, mapování, datové toky.
+
+2.2 Princip oprávnění (základ)
+
+Uživatel vidí:
+
+vlastní data,
+
+data svého týmu (pokud je manažer),
+
+agregace vyšších úrovní (pokud je management),
+
+citlivá HR/odměnová data pouze se zvláštním oprávněním.
+
+Každá entita nese klasifikaci citlivosti (Public/Internal/Confidential/HR-Sensitive).
+
+3) Funkční požadavky (detailní výpis)
+
+Níže dávám požadavky ve stylu FR-xxx, aby šly rovnou použít do backlogu.
+
+3.1 Organizace a identity
+
+FR-001 Evidence organizační struktury (firma → divize → oddělení → tým).
+FR-002 Evidence uživatelů a jejich vztahů (manažer–podřízený, matice).
+FR-003 Podpora dočasných přiřazení (acting manager, zástup, externista).
+FR-004 Import org struktury z HRIS / IAM (viz integrace).
+FR-005 Historie změn org struktury (platnost od–do), aby reporting zpětně „seděl“.
+FR-006 Role a oprávnění (RBAC) + volitelně atributové řízení (ABAC).
+
+3.2 Trojúhelník – Cíle
+3.2.1 Cíle a kaskáda
+
+FR-010 Evidence cílů na úrovni společnosti, domény, týmu, jednotlivce.
+FR-011 Kaskáda cílů (parent–child) včetně mapování „jak přispívám“.
+FR-012 Podpora KPI i OKR:
+
+KPI: metrika + cílová hodnota,
+
+OKR: Objective + Key Results (více KR).
+FR-013 Definice „hotovo“ (DoD) a „měření“ (metodika).
+FR-014 Cíle mají: owner, spoluowner, termín, priorita, váha, rizika, závislosti, status.
+FR-015 Verzování cílů (změna definice metriky musí zanechat stopu).
+FR-016 Možnost šablon cílů (např. incidenty, dostupnost, churn, revenue…).
+
+3.2.2 Závislosti a překážky
+
+FR-020 Evidence závislostí mezi cíli (napříč týmy).
+FR-021 Evidence překážek (blocker) s vlastníkem, SLA a eskalační trasou.
+FR-022 Automatická eskalace překážky při překročení SLA (notifikace + feed).
+FR-023 Evidence rizik (risk register) navázaných na cíle.
+
+3.3 Trojúhelník – Reporting (pravda)
+3.3.1 Reporting metrik
+
+FR-030 Každá metrika má zdroj (ruční / import / výpočet / kombinace).
+FR-031 Podpora časových řad (daily/weekly/monthly) + snapshoty.
+FR-032 Přepočty (např. SLO compliance, MTTR, lead time, conversion).
+FR-033 Evidence „důvěry v data“ (data quality flags, poslední aktualizace).
+FR-034 Alerty na „ticho“: metrika se dlouho neaktualizovala.
+FR-035 Drill-down: CEO vidí agregaci, manažer vidí zdrojové komponenty.
+
+3.3.2 Reporting závazků a rozhodnutí
+
+FR-036 Dohody z 1:1/porad se mění na trackované závazky.
+FR-037 Rozhodnutí (decision log): kdo rozhodl, kdy, proč, dopad, reverzní podmínky.
+FR-038 Přehled „dluhů“: závazky po termínu, opakované blokéry, „neuzavřené rozhodnutí“.
+
+3.4 Trojúhelník – Odměny (spravedlnost)
+3.4.1 Rámec odměn
+
+FR-040 Evidence odměnových rámců dle org jednotek (bonus, uznání, rozvoj, benefity).
+FR-041 Vazba odměn na cíle/míru splnění (váhy, prahy, pravidla).
+FR-042 Podpora nefinančního uznání (kudos) s omezením zneužití (rate limit, moderace).
+FR-043 Schvalovací workflow (manager → head → HR → finance).
+FR-044 Oddělené zobrazení citlivých částí (HR-Sensitive) a audit přístupů.
+
+3.4.2 Rozvoj
+
+FR-045 Rozvojový plán (skills, kurzy, certifikace, mentoring) navázaný na cíle.
+FR-046 Evidence kompetenčního rámce (volitelně) + matice dovedností.
+FR-047 Doporučení rozvojových kroků na základě rolí a gapů (pravidla, ne magie).
+
+3.5 Čtverec – Rituály vedení (operační rytmus)
+3.5.1 1:1
+
+FR-050 Plánování 1:1 (cadence, kalendář).
+FR-051 Agenda šablony (výkon, překážky, wellbeing, rozvoj).
+FR-052 Záznam z 1:1: poznámky, dohody, úkoly, termíny, následné kroky.
+FR-053 Soukromé vs sdílené části záznamu (dvouvrstvá poznámka).
+FR-054 Připomínky: neuzavřené dohody, opakované téma, varovné signály.
+
+3.5.2 Porady
+
+FR-060 Evidence porady: účastníci, agenda, timebox, rozhodnutí, úkoly.
+FR-061 Agenda generovaná z reportingu (co je červené, co blokuje, co je potřeba rozhodnout).
+FR-062 Povinný výstup porady: rozhodnutí + akční kroky (jinak „neuzavřeno“).
+FR-063 Téma parkoviště + priorizace.
+
+3.5.3 Terén / Shadowing (společná práce)
+
+FR-070 Evidence „návštěv“: shadowing, review směny, incident post-mortem, customer call.
+FR-071 Strukturované pozorování: co funguje / co brzdí / návrh zlepšení.
+FR-072 Z toho plynoucí akce: procesní změna, školení, aktualizace runbooku.
+
+3.5.4 Hodnocení (cykly)
+
+FR-080 Roční hodnocení + podporované průběžné check-iny (kvartál/měsíc).
+FR-081 Hodnocení rozdělit na: výsledky (cíle) + chování/kompetence + rozvoj.
+FR-082 „Bez překvapení“: roční shrnutí se skládá z průběžných záznamů.
+FR-083 Workflow schválení + export pro HR/Finance.
+
+3.6 Notifikace a komunikace
+
+FR-090 Notifikace: email / Slack / MS Teams / in-app.
+FR-091 Typy: připomínky rituálů, eskalace překážek, změny cílů, alerty metrik.
+FR-092 Tichý režim + digesty (denní/týdenní) – aby systém neobtěžoval.
+FR-093 Notifikační pravidla per-role (CEO jiné než IC).
+
+3.7 Vyhledávání, znalosti, audit
+
+FR-100 Fulltext vyhledávání (cíle, překážky, rozhodnutí, zápisy).
+FR-101 Tagy a taxonomie (produkt, služba, region, zákazník, doména).
+FR-102 Audit log: přístupy i změny (kdo/ kdy/ co/ odkud).
+FR-103 Retence dat dle klasifikace (např. HR-Sensitive kratší/striktnější).
+FR-104 Export pro audit/compliance (read-only balíčky).
+
+4) Integrace a API napojení (co nejpraktičtěji)
+4.1 Integrační architektura – doporučený vzor
+
+Aby systém nezkolaboval pod různorodostí API:
+
+Connector framework (pluginy) + jednotná smlouva „Connector API“.
+
+Ingestion pipeline:
+
+Pull (scheduled) + Push (webhook) + Event stream (volitelně).
+
+Canonical data model uvnitř aplikace, mapování z externích systémů.
+
+Idempotence (každý import opakovatelný bez duplicit).
+
+Data provenance: u každé hodnoty uložit „odkud je“ + timestamp.
+
+4.2 Typy konektorů
+
+IAM/Identity: Azure AD / AD / Okta / LDAP (uživatelé, skupiny, role).
+
+HRIS: Workday / SAP SuccessFactors / BambooHR… (org struktura, pracovní poměr).
+
+Projektové/Dev: Jira, GitLab/GitHub, Azure DevOps (epicy, issues, PR, lead time).
+
+ITSM: ServiceNow, Jira Service Management (incidenty, změny, requesty).
+
+Monitoring/SRE: Prometheus, Grafana, Datadog, New Relic (SLO, availability, MTTR).
+
+CRM: Salesforce, HubSpot (pipeline, churn, revenue).
+
+Finance: SAP, Oracle, interní BI (budget vs actual).
+
+Komunikace: Slack, MS Teams, Email, kalendáře (O365/Google).
+
+4.3 Požadavky na integrační vrstvu (detail)
+
+INT-001 Konektor musí podporovat: autentizaci, test spojení, mapování, plán běhu.
+INT-002 Podporované auth: OAuth2 (client credentials / auth code), API token, mTLS, Basic (jen výjimečně).
+INT-003 Secret management (Vault/KMS), nikdy neukládat tajemství plaintext.
+INT-004 Webhook endpointy s podpisem (HMAC/JWT), allow-list IP (volitelně).
+INT-005 Rate limiting + backoff + retry politika.
+INT-006 Schopnost „dry-run importu“ (ukázka mapování bez zápisu).
+INT-007 Schema evolution: když se změní pole v externím API, konektor nesmí rozbít core.
+INT-008 Monitoring integrací: poslední úspěch, chybovost, latence, počet záznamů.
+INT-009 Dead-letter queue pro chybné události + možnost reprocess.
+
+4.4 Jaké metriky se typicky počítají z integrací (příklady)
+
+IT/Ops: availability, SLO, incident count, MTTR, change failure rate.
+
+Dev: deployment frequency, lead time for changes, PR cycle time.
+
+Service desk: time to first response, time to resolution, backlog.
+
+Obchod: pipeline, win rate, churn, ARR/MRR.
+Tyto metriky se mapují na cíle a reporting.
+
+4.5 Veřejné API aplikace (pro vaše interní systémy)
+
+Systém musí nabídnout API pro:
+
+API-001 CRUD cíle, metriky, překážky, rozhodnutí, rituály (role-based).
+
+API-002 Ingestion API (příjem událostí z externích systémů).
+
+API-003 Query API (agregace pro BI / dashboardy).
+
+API-004 Webhooky ven (např. „cíl je červený“, „blokér eskaloval“).
+
+API-005 Audit API (pro compliance nástroje, read-only).
+Technicky: REST + případně GraphQL pro složitější dotazy; eventy přes Kafka/Rabbit (volitelně).
+
+5) Datový model (minimální, ale úplný)
+
+Klíčové entity (zkrácený „ER seznam“):
+
+User (id, identityRefs, role, orgUnitId, managerId, status)
+
+OrgUnit (id, parentId, type, validFrom/To)
+
+Goal (id, parentId, ownerId, title, type KPI/OKR, weight, priority, dueDate, status, version)
+
+KeyResult (id, goalId, metricId, target, current, confidence)
+
+Metric (id, name, unit, sourceType manual/import/derived, updateCadence, qualityFlags)
+
+MetricValue (metricId, timestamp, value, sourceRef, provenance)
+
+Obstacle (id, linkedGoalId, ownerId, severity, SLA, escalations, status)
+
+Risk (id, linkedGoalId, likelihood, impact, mitigation)
+
+Ritual (id, type 1:1/meeting/shadowing/review, participants, schedule, templateId)
+
+RitualNote (id, ritualId, sections public/private, actions, sentiment flags optional)
+
+ActionItem (id, sourceType, ownerId, dueDate, status, linkedEntities)
+
+Decision (id, meetingId, deciderId, rationale, impact, reversibleBy, status)
+
+RewardCase (id, personId, period, proposal, approvals, visibility HR-Sensitive)
+
+DevelopmentPlan (id, personId, skills, activities, deadlines)
+
+AuditEvent (who, what, when, where, objectRef, before/after hashes)
+
+6) UX / Obrazovky (co má kdo vidět)
+6.1 CEO dashboard
+
+Top cíle firmy + trend plnění
+
+Heatmap „červené metriky“
+
+Největší překážky + kde stojí rozhodnutí
+
+Zdraví rituálů (agregovaně, bez špehování jednotlivců)
+
+6.2 Manažerský cockpit
+
+Týmové cíle, stav KR, překážky
+
+Týdenní agenda porady (generovaná z reportingu)
+
+Fronta 1:1 (kdo dlouho neměl, co je otevřené)
+
+Decision log a akční kroky
+
+6.3 Pohled jednotlivce
+
+Moje cíle + progres, co blokuje
+
+Dohody z 1:1, úkoly, termíny
+
+Rozvojový plán + uznání
+
+6.4 HR / Finance
+
+Hodnoticí cykly, schvalování, exporty
+
+Odměnové případy s omezeným přístupem
+
+Audit přístupů k HR datům
+
+7) Nefunkční požadavky (aby to unesla „velká pyramida“)
+
+NFR-001 Škálování: tisíce týmů, desetitisíce uživatelů, miliony metrických bodů.
+NFR-002 Dostupnost: min. 99.9 % (konfigurovat).
+NFR-003 Bezpečnost: SSO, MFA (přes IAM), šifrování at-rest/in-transit, least privilege.
+NFR-004 GDPR/Privacy: minimizace osobních dat, retence, anonymizace agregací.
+NFR-005 Auditovatelnost: kompletní audit log a neměnnost (WORM volitelně).
+NFR-006 Výkon: dashboard do 2 s pro běžné dotazy, heavy dotazy přes async/BI.
+NFR-007 Observability: logy, metriky, tracing; monitoring integrací.
+NFR-008 Konfigurovatelnost: šablony agend, typy metrik, cadences, workflow schválení.
+
+8) Konfigurace a rozšiřitelnost (API-first)
+8.1 Konektorové SDK (požadavek)
+
+EXT-001 SDK pro konektory (např. v Python/Go/Node) s:
+
+definicí schématu importu,
+
+mapováním polí,
+
+validací,
+
+standardními retry/backoff,
+
+telemetry hooky.
+
+8.2 Pravidlový engine (volitelné, ale praktické)
+
+„Pokud cíl X klesne pod Y → vytvoř překážku → eskaluj.“
+
+„Pokud metrika nemá update 14 dní → upozorni ownera.“
+
+„Pokud porada skončí bez rozhodnutí → označ jako neuzavřenou.“
+
+9) Akceptační kritéria (MVP i plná verze)
+MVP (doporučené minimum)
+
+Org struktura + SSO
+
+Cíle (kaskáda) + ruční reporting + import z 1–2 systémů
+
+1:1 modul (agenda, dohody, follow-up)
+
+Manažerský a CEO dashboard
+
+Audit změn
+
+Full
+
+Odměny + hodnocení + workflow
+
+Porady + decision log
+
+Překážky + eskalace + SLA
+
+Konektorový framework (min. 6–10 konektorů)
+
+Notifikace (Teams/Slack) + kalendáře
+
+10) Co od tebe teď potřebuji (aby to šlo rovnou přetavit do implementace)
+
+Neptám se „pro jistotu“ – jen abych z toho udělal specifikaci téměř na úrovni backlogu a API kontraktů:
+
+Jaké jsou u vás primární systémy pravdy pro:
+
+org strukturu (HRIS/IAM),
+
+práci (Jira/ServiceNow/…),
+
+monitoring (Prometheus/Grafana/Datadog/…),
+
+komunikaci (Teams/Slack),
+
+odměny (HR/Finance systém)?
+
+Chceš to provozovat on-prem, cloud, nebo hybrid?
+
+Pokud mi napíšeš seznam vašich systémů (stačí odrážkami), vrátím ti v dalším kroku:
+
+konkrétní návrh integračních toků (pull/webhook/event),
+
+návrh API endpointů (REST/GraphQL) a datových schémat,
+
+RBAC matici oprávnění (kdo co přesně vidí a může měnit),
+
+a „MVP backlog“ rozpadnutý na epiky a user stories.
+
+DEVELOPER MODE
+
+ChatGPT can make mistakes. Check important info. See Cookie Preferences.

@@ -1,0 +1,218 @@
+Než začneš „trojúhelník–čtverec“  Jasně. Ten „trojúhelník – čtverec“ Pavel Procházka popsal veřejně i textově (nejen ve videích) tak, že jde o ucelený systém řízení lidí, který stojí na cílech, odměnách, měření a pravidelném manažerském rytmu. e15.cz
+Níže máš konkrétní body „co dělat“ a „jak to dělat správně“ – poskládané přesně podle toho, co v tom rozhovoru vyjmenovává. (U samotného přiřazení 3+4 jde o logickou interpretaci tvarů; seznam kroků je doslova obsahově z jeho popisu.) e15.cz
+
+1) Než začneš „trojúhelník–čtverec“: musí existovat strukturovaná strategie
+Bez směru je i sebelepší vedení jen řemeslo bez smyslu. Procházka to staví tak, že nejdřív má být strategie se strukturou. e15.cz
+Jak správně:
+* Napiš kam firma/tým směřuje (5–7 let) a co to znamená v praxi (trhy, služby, kapacity). e15.cz
+* Z toho odvoď roční cíle a rozpad na kvartály (max. 3–5 priorit).
+* Všechny další kroky níže vždy váž k těmto prioritám – jinak bude reporting i porady jen „pohyb“.
+
+2) „Trojúhelník“ (logická trojice): cíle → odměny → reporting
+V rozhovoru říká, že je potřeba mít pro lidi cíle, za ně odměny a reporting, abys věděl, jak daleko od cíle jsi. e15.cz
+A) Cíle pro lidi
+Jak správně:
+* Každý člověk má 3–7 měřitelných cílů (méně je víc).
+* Cíl je vždy: metrika + cílová hodnota + termín + vlastník.
+* Měj mix:
+    * výsledkových (např. dodávky, SLA, prodej),
+    * vedoucích indikátorů (např. počet review, počet návštěv zákazníků, počet automatizací).
+B) Odměny navázané na cíle
+Jak správně:
+* Předem stanov: za co přesně je odměna (a za co není).
+* Odměna musí být dosažitelná, férová a vyplacená včas – nic neničí důvěru víc než slib bez dodržení.
+* Kromě peněz používej i „odměny statusové“: viditelné uznání, zajímavé úkoly, růst kompetencí.
+C) Reporting (měření vzdálenosti od cíle)
+Jak správně:
+* Reporting má být krátký, pravidelný, stejný formát.
+* Ideál: týdenní dashboard (5–15 metrik), u každé:
+    * aktuál,
+    * trend,
+    * plán,
+    * komentář „proč“ + „co udělám příští týden“.
+* Reporting není kontrola člověka; je to kompas, aby se dalo řídit včas, ne zpětně. e15.cz
+
+3) „Čtverec“ (manažerský rytmus): 1:1 → porady → společné návštěvy → roční hodnocení
+Po trojici výše doplňuje Procházka rytmus: osobní rozhovory, porady, společné návštěvy v terénu a 1× ročně hodnoticí rozhovor s bonusy. e15.cz
+A) Osobní rozhovory (1:1) – „vracení energie“
+Jak správně:
+* Minimum: 1× měsíčně s každým (u nováčků klidně týdně).
+* Struktura 30–45 min:
+    1. výsledky vs. cíle (data, ne dojmy),
+    2. překážky a rizika,
+    3. „energie“: co člověka pálí / co mu dává smysl,
+    4. rozvoj: 1 konkrétní dovednost,
+    5. závazky do příště (2–3 body).
+* Zápis stručně: „co bylo domluveno“ – bez toho se rozhovor rozplyne.
+B) Porady
+Jak správně:
+* Dvě úrovně:
+    * týdenní operativa (30–60 min): metriky → priority → blokery → rozhodnutí.
+    * měsíční taktika (60–120 min): co měníme v systému, kapacitách, prioritách.
+* Každá porada končí:
+    * seznamem úkolů,
+    * vlastníky,
+    * termíny.
+* Zakázané ovoce: „statusy bez rozhodnutí“. Porada má být nástroj řízení, ne rituál.
+C) Společné návštěvy (terén / práce v praxi)
+Jak správně:
+* Plánuj pravidelně (např. 2× měsíčně s každým – dle role).
+* Princip: pozoruju → dávám konkrétní zpětnou vazbu → domlouvám zlepšení.
+* Zpětná vazba vždy na chování a výsledek, ne na osobnost.
+D) Roční hodnoticí rozhovor (a bonusy)
+Jak správně:
+* Připrav se z dat: cíle, trendy, přínosy, incidenty, spolupráce.
+* Výstup jsou 3 věci:
+    1. hodnocení výkonu za rok,
+    2. rozhodnutí o odměně/bonusu,
+    3. plán rozvoje na další rok (2–3 cílené kompetence). e15.cz
+
+Rychlý „správný“ start za 30 dní (aby z toho nebyla teorie)
+1. Týden 1: sepiš strategické priority + definuj 10–15 metrik reportingu.
+2. Týden 2: nastav cíle pro lidi (3–7 na osobu) + pravidla odměn.
+3. Týden 3: zaveď týdenní poradu (pevný formát) + první kolo 1:1.
+4. Týden 4: začni společné návštěvy/pozorování práce + dolaď reporting (ať je čitelný a krátký).
+
+Odkazy, které to opírají o veřejně dohledatelné zdroje
+* Rozhovor, kde Procházka „trojúhelník–čtverec“ přímo vyjmenuje (cíle, odměny, reporting, 1:1, porady, návštěvy, roční hodnocení). e15.cz
+* Kontext jeho výukových materiálů ke řízení (pracuje s nastavováním cílů a komunikací jako základními kameny). Palatinum Academy+1
+
+Poznámka k „důkladné analýze přepisu“ z videí
+V tomhle prostředí se mi nepodařilo spolehlivě stáhnout/otevřít přepisy z platforem (YouTube/Facebook často blokují strojové načítání). Když sem ale vložíš přepis (klidně surový), udělám ti z něj precizní extrakci: pojmy, přesné formulace, pravidla, rytmus, a převedu to do checklistů a šablon pro praxi.
+
+Udelej mi jasny plan co udelat delam na to program a potrebuji to spravne nastavit
+
+Jasně — vezmu to jako návrh implementačního plánu do programu, aby sis „trojúhelník + čtverec“ nastavil správně: cíle → odměny → reporting + manažerský rytmus 1:1, porady, společné návštěvy, roční hodnocení.
+Cíl
+Mít systém, který:
+* každému přiřadí měřitelné cíle,
+* umí spočítat stav plnění (reporting),
+* umí z toho férově odvodit odměny/bonusy,
+* drží pravidelný rytmus řízení (1:1, porady, návštěvy, roční review).
+
+Jasný plán krok za krokem (tak, aby šel přímo převést do aplikace)
+1) Definuj „kostru“ organizace
+Co zavést v programu:
+* Entity: Firma / Oddělení / Tým / Role / Uživatel (člověk).
+* Vztahy: člověk patří do týmu, má roli a má manažera.
+* Oprávnění: admin, HR, manažer, zaměstnanec (minimálně tyto 4).
+Výstup: umíš přiřadit cíle a meetingy správným lidem a manažerům.
+
+2) Nastav strategii a období (aby cíle dávaly smysl)
+Co zavést:
+* Entity: Strategie (vize / směrování), Období (rok, kvartál, měsíc).
+* Každé období má: datum od–do, status (plán / běží / uzavřeno).
+Pravidlo: Cíle se vždy vážou na období (typicky kvartál/rok).
+
+3) Trojúhelník – CÍLE
+3.1 Datový model cíle
+Cíl musí mít:
+* název
+* vlastník (člověk nebo tým)
+* období (kvartál/rok)
+* metrika (typ: číslo / procento / ano-ne / škála)
+* cílová hodnota
+* váha (např. 1–5 nebo %)
+* pravidlo vyhodnocení (>= / <= / interval)
+* zdroj dat (ruční / import / API)
+Pravidlo: 1 člověk má max 3–7 aktivních cílů v období.
+3.2 Workflow cílů
+* návrh cíle (zaměstnanec/manažer)
+* schválení manažerem
+* zamknutí pro období (aby se nehýbaly branky během hry)
+* průběžné aktualizace (reporting)
+* uzavření období
+Výstup: cíle jsou jasné a měřitelné.
+
+4) Trojúhelník – REPORTING (měření vzdálenosti od cíle)
+4.1 Reporting jednotným formátem
+Co zavést:
+* Entity: Report entry (týdenní/měsíční záznam k cíli)
+* Pole: datum, hodnota, komentář „proč“, plán „co udělám příště“, riziko (low/med/high)
+4.2 Dashboard
+* per člověk: plnění cílů, trend, rizika
+* per tým: agregace (vážené plnění), top rizika, kapacitní přetížení (volitelné)
+* per období: historie vs současnost
+Pravidla správně:
+* reporting je pravidelný (týdně ideál),
+* bez komentáře „proč“ je to jen číslo — vynucuj krátký komentář, když trend padá.
+
+5) Trojúhelník – ODMĚNY (bonusy navázané na cíle)
+5.1 Model odměn
+Co zavést:
+* Bonusová pravidla pro období:
+    * prah (např. 80 % = nárok)
+    * strop (např. 120 %)
+    * vážené skóre z cílů
+* Bonus může být:
+    * finanční (částka / %)
+    * nefinanční (badge, uznání, rozvoj) – klidně jen evidenčně
+5.2 Výpočet (jednoduchý a obhajitelný)
+* Skóre cíle = funkce(plnění, prahy, stropy)
+* Celkové skóre = suma( skóre cíle * váha cíle )
+* Bonus = funkce(celkové skóre, budget, pravidla období)
+Pravidla správně:
+* pravidla musí být vidět dopředu (transparentní),
+* změny pravidel až od dalšího období.
+
+Čtverec – manažerský rytmus (procesy v aplikaci)
+6) 1:1 rozhovory (opakovaný plán + zápis)
+Co zavést:
+* Scheduler: 1:1 šablona (frekvence: týdně / 2 týdny / měsíčně)
+* Záznam z 1:1: témata, závěry, úkoly, follow-up datum
+Struktura 1:1 v aplikaci:
+1. cíle + data (auto se načte z dashboardu)
+2. překážky
+3. energie/motivace
+4. rozvoj
+5. závazky do příště (max 3)
+
+7) Porady (týdenní operativa + měsíční taktika)
+Co zavést:
+* typ porady (weekly / monthly)
+* agenda šablona
+* rozhodnutí + úkoly + vlastníci + termíny
+Pravidlo správně: porada bez rozhodnutí = chyba procesu (můžeš měřit).
+
+8) Společné návštěvy / „v terénu“
+To může být u IT spíš:
+* společné řešení incidentu,
+* review práce (code review / postmortem),
+* návštěva zákazníka / interního stakeholdera.
+Co zavést:
+* typ „visit/session“
+* zápis pozorování + zpětná vazba + dohodnutá změna
+
+9) Roční hodnocení
+Co zavést:
+* roční review form
+* automatické předvyplnění: cíle za rok, plnění, trendy, feedback
+* výstupy: hodnocení, bonus, rozvojový plán
+
+Minimální „MVP“ aby to fungovalo rychle (doporučuju takto)
+MVP1 (2–4 týdny vývoje)
+* uživatelé/týmy/role
+* cíle (3–7 na člověka) + schválení
+* reporting (týdenní hodnoty) + dashboard
+* 1:1 plán + záznam + úkoly
+MVP2
+* bonusová pravidla + výpočet bonusů
+* porady s agendou + rozhodnutí
+* notifikace (reporting missing, 1:1 overdue)
+MVP3
+* roční hodnocení + rozvojový plán
+* „návštěvy/session“ + strukturovaná zpětná vazba
+* importy dat (API/CSV)
+
+Kontrolní seznam „správně nastaveno“
+* Každý cíl má metriku + cílovou hodnotu + termín + vlastníka
+* Reporting běží pravidelně a v jednom formátu
+* Odměny jsou navázané na cíle a jsou transparentní dopředu
+* 1:1 mají rytmus a končí závazky
+* Porady končí rozhodnutím a úkoly
+* Roční review bere data, ne dojmy
+
+Pokud chceš, napíšu ti to ještě víc „programátorsky“ jako konkrétní datový model (tabulky / entity), API endpointy a stavové diagramy (Goal lifecycle, Reporting cadence, Bonus calculation). Stačí říct, v čem to stavíš (Django/Laravel/Spring/Node) a jestli chceš SQL nebo NoSQL.
+
+
+

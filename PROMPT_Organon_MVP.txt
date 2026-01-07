@@ -1,0 +1,190 @@
+# Master Prompt: Project Organon - MVP v1.0
+
+## 1. Objective
+
+Build the Minimum Viable Product (MVP) for "Project Organon," a web application designed to be an "organizational operating system." The primary goal of this MVP is to perfect the core "basic building block" of management: the interaction between a manager and their subordinates.
+
+The application must be built on a flexible architecture that supports both local user management and integration with external identity providers like Active Directory.
+
+This prompt is based on the detailed specification found in `nevrhresenitrojuhelnikctverec.txt`.
+
+## 2. Core Principles & Architecture
+
+### Technology Stack
+- **Frontend:** React with TypeScript, bootstrapped with Vite.
+- **UI Framework:** Material-UI (MUI) for a clean, professional, and component-based design.
+- **Backend:** Node.js with Express.js and TypeScript.
+- **Database:** PostgreSQL.
+- **ORM:** Prisma.io for type-safe database access.
+- **Monorepo (Recommended):** Use pnpm workspaces to manage `frontend` and `backend` packages in a single repository.
+
+### Key Architectural Concepts
+- **Pluggable Identity Provider:** The application's user and organization data must be served through an abstract `UserProvider` interface. This is the most critical architectural requirement.
+    - **`interface UserProvider`**: Must define methods like `getUsers(): Promise<User[]>`, `getUserById(id): Promise<User | null>`, `getUsersByManager(managerId): Promise<User[]>`.
+    - **Initial Implementations:**
+        1.  **`LocalUserProvider`**: Manages users and relationships stored directly in the application's PostgreSQL database. It will be used when the app runs in "Local Mode".
+        2.  **`ActiveDirectoryUserProvider`**: Connects to a customer's Active Directory (on-premise or Azure AD) using a library like `ldapjs`. It will fetch users and their `manager` attributes to build the organizational hierarchy on the fly. This provider will be read-only in terms of user data.
+- **Bidirectional UI:** The UI must be designed to serve two primary viewpoints seamlessly:
+    - **Manager View ("My Team"):** A manager-centric view to oversee their team.
+    - **Individual View ("My Overview"):** A self-service view for every employee.
+
+## 3. Database Schema (Prisma)
+
+Define the following schema in `schema.prisma`.
+
+```prisma
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id              String        @id @default(cuid())
+  email           String        @unique
+  name            String?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  // Self-relation for manager hierarchy
+  managerId       String?
+  manager         User?         @relation("ManagerSubordinates", fields: [managerId], references: [id])
+  subordinates    User[]        @relation("ManagerSubordinates")
+
+  // Relationships
+  goalsOwned      Goal[]        @relation("Owner")
+  actionItemsOwned ActionItem[] @relation("Owner")
+  kudosGiven      Kudos[]       @relation("Giver")
+  kudosReceived   Kudos[]       @relation("Receiver")
+  RitualAsManager Ritual1on1[]  @relation("Manager")
+  RitualAsSubordinate Ritual1on1[]  @relation("Subordinate")
+}
+
+model Goal {
+  id          String      @id @default(cuid())
+  title       String
+  description String?
+  status      String      @default("OnTrack") // e.g., OnTrack, AtRisk, OffTrack
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  ownerId     String
+  owner       User        @relation("Owner", fields: [ownerId], references: [id])
+  keyResults  KeyResult[]
+}
+
+model KeyResult {
+  id           String   @id @default(cuid())
+  title        String
+  currentValue Float
+  targetValue  Float
+  confidence   Float    @default(1.0) // 0.0 to 1.0
+
+  goalId       String
+  goal         Goal     @relation(fields: [goalId], references: [id])
+}
+
+model Ritual1on1 {
+    id              String @id @default(cuid())
+    scheduledDate   DateTime
+    createdAt       DateTime @default(now())
+
+    managerId       String
+    subordinateId   String
+    manager         User @relation("Manager", fields: [managerId], references: [id])
+    subordinate     User @relation("Subordinate", fields: [subordinateId], references: [id])
+
+    notes           RitualNote[]
+    actionItems     ActionItem[]
+}
+
+model RitualNote {
+    id          String      @id @default(cuid())
+    content     String
+    isPrivate   Boolean     @default(false) // True if it's a private note for one user
+
+    ritualId    String
+    ritual      Ritual1on1  @relation(fields: [ritualId], references: [id])
+    authorId    String      // To know who wrote the note
+}
+
+
+model ActionItem {
+  id          String   @id @default(cuid())
+  description String
+  dueDate     DateTime
+  status      String   @default("Todo") // Todo, InProgress, Done
+
+  ownerId     String
+  owner       User     @relation("Owner", fields: [ownerId], references: [id])
+  ritualId    String
+  ritual      Ritual1on1 @relation(fields: [ritualId], references: [id])
+}
+
+model Kudos {
+  id        String   @id @default(cuid())
+  text      String
+  createdAt DateTime @default(now())
+
+  giverId   String
+  giver     User     @relation("Giver", fields: [giverId], references: [id])
+  receiverId String
+  receiver  User     @relation("Receiver", fields: [receiverId], references: [id])
+}
+```
+
+## 4. API Endpoints (RESTful)
+
+Define the following backend API endpoints. All endpoints must be authenticated and authorized based on the user's role and relationship.
+
+- **`GET /api/me`**: Get the profile of the currently logged-in user.
+- **`GET /api/team`**: Get the profiles of the current user's direct subordinates. (Requires manager role).
+- **`GET /api/users/:userId/goals`**: Get goals for a specific user. (A manager can get goals for their report; an individual can get their own).
+- **`POST /api/goals`**: Create a new goal for a user. (Manager assigning to a report).
+- **`PUT /api/keyresults/:krId`**: Update the `currentValue` of a key result. (Typically done by the goal owner).
+- **`GET /api/1on1s`**: Get upcoming and past 1:1s for the current user.
+- **`POST /api/1on1s/:ritualId/notes`**: Add a shared agenda item to a 1:1.
+- **`POST /api/1on1s/:ritualId/actionitems`**: Create an action item from a 1:1.
+- **`POST /api/kudos`**: Give kudos to another user.
+
+## 5. Key Feature Implementation Plan
+
+### Step 1: Backend Setup & Core Models
+- Set up the Node.js/Express/Prisma backend.
+- Implement the Prisma schema and generate the client.
+- Create the core `UserProvider` interface.
+
+### Step 2: Implement Local User Management
+- Implement `LocalUserProvider`.
+- Create API endpoints for an Admin to manually create users and assign managers.
+- Implement basic email/password authentication (e.g., using `bcrypt` and JWTs).
+
+### Step 3: Frontend - The Two Main Views
+- Build the main application layout with a sidebar.
+- **Manager View ("My Team"):**
+    - Create a page that fetches data from `/api/team`.
+    - Display a grid of `UserCard` components for each subordinate.
+- **Individual View ("My Overview"):**
+    - Create a dashboard that fetches data from `/api/me` and `/api/users/:userId/goals`.
+    - Display widgets for "My Goals", "My Action Items", "My Manager".
+
+### Step 4: Implement Goal & 1:1 Functionality
+- Build the frontend components for creating/viewing goals and KRs (with progress bars).
+- Build the frontend for the 1:1 view, allowing users to add agenda items and create action items.
+- Implement the corresponding backend APIs.
+
+### Step 5: Implement AD Integration (Proof of Concept)
+- Implement the `ActiveDirectoryUserProvider` using `ldapjs`.
+- Add a configuration page for an Admin to enter AD connection details.
+- Create a mechanism (e.g., a hidden API endpoint or a cron job) to trigger the sync.
+- The authentication logic should be adapted to delegate to AD for password verification in this mode.
+
+## 6. Final Deliverable
+
+A functional web application that fulfills the MVP requirements, allowing users to be managed locally or imported from Active Directory, and enabling the core loop of setting goals, conducting 1:1s, and giving feedback between managers and subordinates.

@@ -1,0 +1,46 @@
+Návrh řešení: Verze 1.0
+Datum: 27. 12. 2025
+
+Tento dokument reflektuje diskuzi a upřesnění původního zadání z "trojuhelnikctverec.txt". Definuje rozsah a funkčnost pro první implementační fázi (MVP - Minimum Viable Product).
+
+1.0 Koncepce a Cíl MVP
+
+Hlavním cílem verze 1.0 je postavit a ověřit funkční jádro aplikace, tzv. "základní stavební buňku". Tou je interakce mezi manažerem a jeho podřízeným. Vědomě odsouváme komplexní integrace (kromě správy identit) a pokročilé funkce, abychom se soustředili na perfektní zvládnutí základního uživatelského scénáře.
+
+2.0 Klíčové Funkcionality
+
+2.1 Obousměrný tok (Dva hlavní pohledy)
+Aplikace bude od základu navržena pro dva klíčové pohledy:
+- **Pohled Manažera ("Můj tým"):** Umožňuje manažerovi vidět přehled svých přímých podřízených, jejich klíčové cíle a snadno vstupovat do detailu každého z nich.
+- **Pohled Jednotlivce ("Můj přehled"):** Umožňuje každému uživateli vidět své vlastní cíle, úkoly, zpětnou vazbu a kontext svého týmu a manažera.
+
+2.2 Interakce v rámci "základní buňky"
+- **Správa cílů:** Manažer může založit cíl a přiřadit ho podřízenému. Podřízený může u cíle aktualizovat jeho stav nebo progres na klíčových výsledcích (Key Results).
+- **Rituál 1:1 (One-on-One):** Systém poskytne sdílený prostor pro manažera a podřízeného k vedení agendy pro jejich 1:1 schůzky. Z těchto schůzek lze vytvářet sledovatelné "Dohody" nebo "Akční kroky" s termínem a vlastníkem.
+- **Zpětná vazba a Uznání:** V první verzi bude implementována jednoduchá forma nefinančního uznání ("Kudos" nebo "Pochvala"), kterou může manažer (nebo kolega) udělit.
+
+3.0 Architektura Správy Uživatelů
+
+Pro maximální flexibilitu bude správa uživatelů a organizační struktury řešena přes abstraktní vrstvu "Poskytovatele identity" (Identity Provider). Verze 1.0 bude obsahovat dvě implementace:
+
+3.1 Lokální režim
+- Umožňuje plnohodnotné používání aplikace bez nutnosti externí integrace.
+- Administrátor může ručně vytvářet, upravovat a deaktivovat uživatele přímo v aplikaci.
+- Vztah nadřízený-podřízený se nastavuje ručně výběrem manažera z existujícího seznamu uživatelů.
+
+3.2 Režim s AD integrací
+- Umožňuje napojení na Microsoft Active Directory (on-premise i Azure AD).
+- Administrátor v aplikaci nakonfiguruje připojení a určí, která organizační skupina (nebo skupiny) v AD se má synchronizovat.
+- Aplikace automaticky (v pravidelných intervalech) načte uživatele z dané skupiny.
+- Vztah nadřízený-podřízený se automaticky odvodí z atributu "manager" v AD a promítne se do organizační struktury v aplikaci.
+
+4.0 Co NENÍ součástí MVP verze 1.0
+
+Následující funkcionality z původního dokumentu jsou vědomě odloženy na pozdější verze, aby byla zajištěna rychlost a kvalita dodávky MVP:
+- Pokročilé reportingové dashboardy pro CEO a vyšší management.
+- Komplexní moduly pro finanční odměny a bonusy.
+- Schvalovací workflow.
+- Integrace s dalšími systémy (Jira, MS Teams, Slack, HRIS systémy atd.).
+- Modul pro porady, shadowing a hodnocení.
+- Pravidlový engine pro automatizaci.
+- Fulltextové vyhledávání napříč všemi moduly.
