@@ -137,4 +137,51 @@ class UserRepository
         $stmt = $this->pdo->prepare("DELETE FROM users WHERE id = ?");
         return $stmt->execute([$id]);
     }
+
+    /**
+     * Find all direct and indirect subordinates for a given manager ID.
+     * Subordinates are defined as:
+     * 1. Users who are managers of departments under the manager's hierarchy.
+     * 2. Users who are members of departments under the manager's hierarchy.
+     * The manager itself is excluded.
+     *
+     * @param int $managerId The ID of the manager.
+     * @return array A list of subordinate user objects (id, full_name, username, email).
+     */
+    public function findAllSubordinates(int $managerId): array
+    {
+        $sql = "
+            WITH RECURSIVE SubordinateDepartments(id) AS (
+                -- Anchor member: departments directly managed by the given manager
+                SELECT id FROM departments WHERE manager_id = :managerId
+
+                UNION ALL
+
+                -- Recursive member: child departments of previously found subordinate departments
+                SELECT d.id
+                FROM departments d
+                INNER JOIN SubordinateDepartments sd ON d.parent_id = sd.id
+            ),
+            SubordinateUsers AS (
+                -- Users who are members of any subordinate department
+                SELECT DISTINCT u.id, u.full_name, u.username, u.email
+                FROM users u
+                JOIN user_departments ud ON u.id = ud.user_id
+                JOIN SubordinateDepartments sd ON ud.department_id = sd.id
+            )
+            -- Combine all unique subordinate users
+            SELECT DISTINCT
+                su.id,
+                su.full_name,
+                su.username,
+                su.email
+            FROM SubordinateUsers su
+            WHERE su.id != :managerId -- Exclude the manager itself
+            ORDER BY su.full_name;
+        ";
+
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([':managerId' => $managerId]);
+        return $stmt->fetchAll();
+    }
 }

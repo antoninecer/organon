@@ -202,6 +202,14 @@ switch ($page) {
         include __DIR__ . '/../templates/dashboard.php';
         break;
 
+    case 'my_team':
+        include __DIR__ . '/../templates/my_team.php';
+        break;
+
+    case 'subordinate_detail':
+        include __DIR__ . '/../templates/subordinate_detail.php';
+        break;
+
     case 'goals':
         include __DIR__ . '/../templates/goals.php';
         break;

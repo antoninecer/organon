@@ -85,4 +85,25 @@ class ActionItemRepository
         $stmt = $this->pdo->prepare("DELETE FROM action_items WHERE id = ?");
         return $stmt->execute([$id]);
     }
+
+    /**
+     * Find all action items owned by a specific user.
+     * @param int $ownerId
+     * @return array
+     */
+    public function findByOwner(int $ownerId): array
+    {
+        $sql = "
+            SELECT 
+                ai.*,
+                owner.full_name as owner_name
+            FROM action_items ai
+            LEFT JOIN users owner ON ai.owner_id = owner.id
+            WHERE ai.owner_id = :ownerId
+            ORDER BY ai.due_date DESC, ai.created_at DESC
+        ";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([':ownerId' => $ownerId]);
+        return $stmt->fetchAll();
+    }
 }

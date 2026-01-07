@@ -81,4 +81,27 @@ class RecognitionRepository
         $stmt = $this->pdo->prepare("DELETE FROM recognitions WHERE id = ?");
         return $stmt->execute([$id]);
     }
+
+    /**
+     * Find all recognitions received by a specific user.
+     * @param int $receiverId
+     * @return array
+     */
+    public function findByReceiver(int $receiverId): array
+    {
+        $sql = "
+            SELECT 
+                r.*,
+                giver.full_name as giver_name,
+                receiver.full_name as receiver_name
+            FROM recognitions r
+            LEFT JOIN users giver ON r.giver_id = giver.id
+            LEFT JOIN users receiver ON r.receiver_id = receiver.id
+            WHERE r.receiver_id = :receiverId
+            ORDER BY r.created_at DESC
+        ";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([':receiverId' => $receiverId]);
+        return $stmt->fetchAll();
+    }
 }

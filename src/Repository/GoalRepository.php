@@ -88,4 +88,27 @@ class GoalRepository
         $stmt = $this->pdo->prepare("DELETE FROM goals WHERE id = ?");
         return $stmt->execute([$id]);
     }
+
+    /**
+     * Find all goals assigned to a specific user.
+     * @param int $assigneeId
+     * @return array
+     */
+    public function findByAssignee(int $assigneeId): array
+    {
+        $sql = "
+            SELECT 
+                g.*,
+                assignee.full_name as assignee_name,
+                manager.full_name as manager_name
+            FROM goals g
+            LEFT JOIN users assignee ON g.assignee_id = assignee.id
+            LEFT JOIN users manager ON g.manager_id = manager.id
+            WHERE g.assignee_id = :assigneeId
+            ORDER BY g.due_date DESC, g.created_at DESC
+        ";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([':assigneeId' => $assigneeId]);
+        return $stmt->fetchAll();
+    }
 }

@@ -27,6 +27,7 @@ $user = $auth->user();
         </ul>
         <ul>
             <li><a href="index.php?page=dashboard">Dashboard</a></li>
+            <li><a href="index.php?page=my_team">Můj tým</a></li>
             <li><a href="index.php?page=goals">Cíle</a></li>
             <li><a href="index.php?page=action_items">Úkoly</a></li>
             <li><a href="index.php?page=recognitions">Pochvaly</a></li>
