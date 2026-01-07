@@ -93,12 +93,12 @@ if (isset($_GET['edit_id'])) {
                         <td><?= htmlspecialchars($department['parent_name'] ?? '—') ?></td>
                         <td><?= htmlspecialchars($department['manager_name'] ?? '—') ?></td>
                         <td>
-                            <div class="grid">
-                                <a href="index.php?page=departments&edit_id=<?= $department['id'] ?>" role="button" class="contrast outline">Upravit</a>
+                            <div style="display: flex; gap: 0.5rem; align-items: center;">
+                                <a href="index.php?page=departments&edit_id=<?= $department['id'] ?>" role="button" class="contrast outline" style="margin-bottom: 0;">Edit</a>
                                 <form method="POST" action="index.php?page=departments" style="margin: 0;">
                                     <input type="hidden" name="action" value="delete_department">
                                     <input type="hidden" name="id" value="<?= $department['id'] ?>">
-                                    <button type="submit" class="contrast" onclick="return confirm('Opravdu chcete smazat toto oddělení?')">Smazat</button>
+                                    <button type="submit" class="contrast" onclick="return confirm('Opravdu chcete smazat toto oddělení?')">Delete</button>
                                 </form>
                             </div>
                         </td>
