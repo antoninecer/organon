@@ -38,6 +38,7 @@ class Auth
                 'id' => $user['id'],
                 'username' => $user['username'],
                 'full_name' => $user['full_name'],
+                'is_admin' => (bool)$user['is_admin'],
             ];
             $this->user = $_SESSION['user'];
             return true;
@@ -63,6 +64,15 @@ class Auth
     public function check(): bool
     {
         return isset($_SESSION['user']);
+    }
+
+    /**
+     * Check if the authenticated user is an administrator.
+     * @return bool
+     */
+    public function isAdmin(): bool
+    {
+        return $this->check() && !empty($this->user['is_admin']);
     }
 
     /**

@@ -65,6 +65,11 @@ if (isset($_GET['edit_id'])) {
             <input type="password" id="password" name="password" <?= $editingUser ? '' : 'required' ?>>
         </label>
         
+        <label for="is_admin">
+          <input type="checkbox" id="is_admin" name="is_admin" value="1" <?= ($editingUser && $editingUser['is_admin']) ? 'checked' : '' ?>>
+          Uživatel je administrátor
+        </label>
+
         <div class="grid">
             <button type="submit"><?= $editingUser ? 'Uložit změny' : 'Vytvořit uživatele' ?></button>
             <?php if ($editingUser): ?>

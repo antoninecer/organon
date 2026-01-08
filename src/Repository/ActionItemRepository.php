@@ -50,7 +50,7 @@ class ActionItemRepository
         $id = $data['id'] ?? null;
 
         if ($id) {
-            // Update
+            // Update - creator_id is not changed on update
             $sql = "UPDATE action_items SET title = ?, owner_id = ?, due_date = ?, status = ?, context = ? WHERE id = ?";
             $stmt = $this->pdo->prepare($sql);
             return $stmt->execute([
@@ -63,11 +63,12 @@ class ActionItemRepository
             ]);
         } else {
             // Create
-            $sql = "INSERT INTO action_items (title, owner_id, due_date, status, context) VALUES (?, ?, ?, ?, ?)";
+            $sql = "INSERT INTO action_items (title, owner_id, creator_id, due_date, status, context) VALUES (?, ?, ?, ?, ?, ?)";
             $stmt = $this->pdo->prepare($sql);
             return $stmt->execute([
                 $data['title'],
                 $data['owner_id'],
+                $data['creator_id'], // Set only on creation
                 empty($data['due_date']) ? null : $data['due_date'],
                 $data['status'],
                 $data['context']
@@ -96,14 +97,52 @@ class ActionItemRepository
         $sql = "
             SELECT 
                 ai.*,
-                owner.full_name as owner_name
+                owner.full_name as owner_name,
+                creator.full_name as creator_name
             FROM action_items ai
             LEFT JOIN users owner ON ai.owner_id = owner.id
+            LEFT JOIN users creator ON ai.creator_id = creator.id
             WHERE ai.owner_id = :ownerId
             ORDER BY ai.due_date DESC, ai.created_at DESC
         ";
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([':ownerId' => $ownerId]);
         return $stmt->fetchAll();
+    }
+    
+    /**
+     * Find all action items created by a specific user.
+     * @param int $creatorId
+     * @return array
+     */
+    public function findByCreator(int $creatorId): array
+    {
+        $sql = "
+            SELECT
+                ai.*,
+                owner.full_name as owner_name,
+                creator.full_name as creator_name
+            FROM action_items ai
+            LEFT JOIN users owner ON ai.owner_id = owner.id
+            LEFT JOIN users creator ON ai.creator_id = creator.id
+            WHERE ai.creator_id = :creatorId
+            ORDER BY ai.due_date DESC, ai.created_at DESC
+        ";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([':creatorId' => $creatorId]);
+        return $stmt->fetchAll();
+    }
+
+    /**
+     * Update the status of a single action item.
+     * @param int $id
+     * @param string $status
+     * @return bool
+     */
+    public function updateStatus(int $id, string $status): bool
+    {
+        $sql = "UPDATE action_items SET status = ? WHERE id = ?";
+        $stmt = $this->pdo->prepare($sql);
+        return $stmt->execute([$status, $id]);
     }
 }

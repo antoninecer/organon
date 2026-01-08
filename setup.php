@@ -19,6 +19,7 @@ try {
             email TEXT NOT NULL UNIQUE,
             password_hash TEXT NOT NULL,
             full_name TEXT NOT NULL,
+            is_admin INTEGER DEFAULT 0,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         );",
 
@@ -82,11 +83,13 @@ try {
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             title TEXT NOT NULL,
             owner_id INTEGER NOT NULL,
+            creator_id INTEGER NOT NULL,
             due_date DATE,
             status TEXT NOT NULL DEFAULT 'new',
             context TEXT,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            FOREIGN KEY (owner_id) REFERENCES users(id) ON DELETE CASCADE
+            FOREIGN KEY (owner_id) REFERENCES users(id) ON DELETE CASCADE,
+            FOREIGN KEY (creator_id) REFERENCES users(id) ON DELETE CASCADE
         );",
 
         // Recognitions / Kudos
@@ -106,7 +109,7 @@ try {
             manager_id INTEGER NOT NULL,
             subordinate_id INTEGER NOT NULL,
             note_date DATE NOT NULL,
-            content TEXT NOT NULL,
+            note TEXT NOT NULL,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             FOREIGN KEY (manager_id) REFERENCES users(id) ON DELETE CASCADE,
             FOREIGN KEY (subordinate_id) REFERENCES users(id) ON DELETE CASCADE

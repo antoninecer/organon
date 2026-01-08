@@ -14,6 +14,8 @@ require_once __DIR__ . '/../src/Repository/GoalRepository.php';
 require_once __DIR__ . '/../src/Repository/ActionItemRepository.php';
 require_once __DIR__ . '/../src/Repository/RecognitionRepository.php';
 require_once __DIR__ . '/../src/Repository/GoalReportRepository.php';
+require_once __DIR__ . '/../src/Repository/OneOnOneNoteRepository.php';
+
 require_once __DIR__ . '/../src/Helpers/GoalPermissions.php';
 
 $auth = new Auth();
@@ -23,6 +25,16 @@ $goalRepo = new GoalRepository();
 $actionItemRepo = new ActionItemRepository();
 $recognitionRepo = new RecognitionRepository();
 $goalReportRepo = new GoalReportRepository();
+$oneOnOneNoteRepo = new OneOnOneNoteRepository();
+
+/**
+ * Redirects user to dashboard with an "Unauthorized" error message.
+ */
+function _unauthorized() {
+    $_SESSION['error_message'] = 'K této akci nemáte oprávnění.';
+    header('Location: index.php?page=dashboard');
+    exit;
+}
 
 // --- Action Handling ---
 $action = $_POST['action'] ?? $_GET['action'] ?? null;
@@ -47,6 +59,7 @@ if ($action === 'logout') {
 
 // Department Actions
 if ($action === 'create_department' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    if (!$auth->isAdmin()) { _unauthorized(); }
     $name = $_POST['name'] ?? '';
     $parentId = !empty($_POST['parent_id']) ? (int)$_POST['parent_id'] : null;
     $managerId = !empty($_POST['manager_id']) ? (int)$_POST['manager_id'] : null;
@@ -56,6 +69,7 @@ if ($action === 'create_department' && $_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 if ($action === 'update_department' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    if (!$auth->isAdmin()) { _unauthorized(); }
     $id = (int)$_POST['id'];
     $name = $_POST['name'] ?? '';
     $parentId = !empty($_POST['parent_id']) ? (int)$_POST['parent_id'] : null;
@@ -66,6 +80,7 @@ if ($action === 'update_department' && $_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 if ($action === 'delete_department' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    if (!$auth->isAdmin()) { _unauthorized(); }
     $id = (int)$_POST['id'];
     $departmentRepo->delete($id);
     header('Location: index.php?page=departments');
@@ -74,6 +89,7 @@ if ($action === 'delete_department' && $_SERVER['REQUEST_METHOD'] === 'POST') {
 
 // User Actions
 if ($action === 'save_user' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    if (!$auth->isAdmin()) { _unauthorized(); }
     $userData = [
         'id' => !empty($_POST['id']) ? (int)$_POST['id'] : null,
         'username' => $_POST['username'],
@@ -81,6 +97,7 @@ if ($action === 'save_user' && $_SERVER['REQUEST_METHOD'] === 'POST') {
         'email' => $_POST['email'],
         'password' => $_POST['password'],
         'department_id' => !empty($_POST['department_id']) ? (int)$_POST['department_id'] : null,
+        'is_admin' => isset($_POST['is_admin']) ? 1 : 0,
     ];
     $userRepo->save($userData);
     header('Location: index.php?page=users');
@@ -88,6 +105,7 @@ if ($action === 'save_user' && $_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 if ($action === 'delete_user' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    if (!$auth->isAdmin()) { _unauthorized(); }
     $id = (int)$_POST['id'];
     if ($id !== $auth->id()) { // Extra check to prevent deleting yourself
         $userRepo->delete($id);
@@ -101,7 +119,7 @@ if ($action === 'save_goal' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     $uploaderId = $auth->id();
     $assigneeId = (int)$_POST['assignee_id'];
 
-    if (!is_ancestor_manager($uploaderId, $assigneeId, $userRepo, $departmentRepo)) {
+    if (!is_ancestor_manager($uploaderId, $assigneeId, $userRepo, $departmentRepo, $auth)) {
         $_SESSION['error_message'] = 'Nemáte oprávnění přidělit cíl tomuto uživateli.';
         header('Location: index.php?page=goals');
         exit;
@@ -133,12 +151,27 @@ if ($action === 'delete_goal' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     exit;
 }
 
+if ($action === 'update_goal_status' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    $goalId = (int)$_POST['goal_id'];
+    $status = $_POST['status'];
+    $goal = $goalRepo->find($goalId);
+
+    // Security check: Only the assignee can update the status
+    if ($goal && $goal['assignee_id'] === $auth->id()) {
+        $goalRepo->updateStatus($goalId, $status);
+    } else {
+        $_SESSION['error_message'] = 'Nemáte oprávnění upravit tento cíl.';
+    }
+    header('Location: index.php?page=goals');
+    exit;
+}
+
 // Action Item Actions
 if ($action === 'save_action_item' && $_SERVER['REQUEST_METHOD'] === 'POST') {
-    $uploaderId = $auth->id();
+    $creatorId = $auth->id();
     $ownerId = (int)$_POST['owner_id'];
 
-    if (!is_ancestor_manager($uploaderId, $ownerId, $userRepo, $departmentRepo)) {
+    if (!is_ancestor_manager($creatorId, $ownerId, $userRepo, $departmentRepo, $auth)) {
         $_SESSION['error_message'] = 'Nemáte oprávnění přidělit úkol tomuto uživateli.';
         header('Location: index.php?page=action_items');
         exit;
@@ -148,6 +181,7 @@ if ($action === 'save_action_item' && $_SERVER['REQUEST_METHOD'] === 'POST') {
         'id' => !empty($_POST['id']) ? (int)$_POST['id'] : null,
         'title' => $_POST['title'],
         'owner_id' => $ownerId,
+        'creator_id' => $creatorId,
         'due_date' => $_POST['due_date'],
         'status' => $_POST['status'],
         'context' => $_POST['context']
@@ -159,7 +193,23 @@ if ($action === 'save_action_item' && $_SERVER['REQUEST_METHOD'] === 'POST') {
 
 if ($action === 'delete_action_item' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     $id = (int)$_POST['id'];
+    // Optional: Add security check to ensure only creator can delete
     $actionItemRepo->delete($id);
+    header('Location: index.php?page=action_items');
+    exit;
+}
+
+if ($action === 'update_action_item_status' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    $actionItemId = (int)$_POST['action_item_id'];
+    $status = $_POST['status'];
+    $item = $actionItemRepo->find($actionItemId);
+
+    // Security check: Only the owner can update the status
+    if ($item && $item['owner_id'] === $auth->id()) {
+        $actionItemRepo->updateStatus($actionItemId, $status);
+    } else {
+        $_SESSION['error_message'] = 'Nemáte oprávnění upravit tento úkol.';
+    }
     header('Location: index.php?page=action_items');
     exit;
 }
@@ -207,6 +257,50 @@ if ($action === 'delete_goal_report' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     $id = (int)$_POST['id'];
     $goalReportRepo->delete($id);
     header('Location: index.php?page=goal_report&goal_id=' . $goalId);
+    exit;
+}
+
+// One-on-One Note Actions
+if ($action === 'save_one_on_one_note' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    $subordinateId = (int)$_POST['subordinate_id'];
+    $managerId = $auth->id(); // The manager is the currently logged-in user
+
+    // Basic authorization check: a manager can only add notes for their direct or indirect subordinates.
+    if (!is_ancestor_manager($managerId, $subordinateId, $userRepo, $departmentRepo, $auth) && $managerId !== $subordinateId) {
+        $_SESSION['error_message'] = 'Nemáte oprávnění přidávat poznámky tomuto uživateli.';
+        header('Location: index.php?page=subordinate_detail&id=' . $subordinateId);
+        exit;
+    }
+
+    $noteData = [
+        'id' => !empty($_POST['id']) ? (int)$_POST['id'] : null,
+        'manager_id' => $managerId,
+        'subordinate_id' => $subordinateId,
+        'note' => $_POST['note'],
+        'note_date' => $_POST['note_date']
+    ];
+
+    if ($noteData['id']) {
+        $oneOnOneNoteRepo->update($noteData['id'], $noteData['note'], $noteData['note_date']);
+    } else {
+        $oneOnOneNoteRepo->create($noteData['manager_id'], $noteData['subordinate_id'], $noteData['note'], $noteData['note_date']);
+    }
+    header('Location: index.php?page=subordinate_detail&user_id=' . $subordinateId);
+    exit;
+}
+
+if ($action === 'delete_one_on_one_note' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    $id = (int)$_POST['id'];
+    $subordinateId = (int)$_POST['subordinate_id'];
+    $note = $oneOnOneNoteRepo->find($id);
+
+    // Only the manager who created the note can delete it
+    if ($note && $note['manager_id'] === $auth->id()) {
+        $oneOnOneNoteRepo->delete($id);
+    } else {
+        $_SESSION['error_message'] = 'Nemáte oprávnění smazat tuto poznámku.';
+    }
+    header('Location: index.php?page=subordinate_detail&user_id=' . $subordinateId);
     exit;
 }
 

@@ -60,6 +60,23 @@ Bylo vytvořeno funkční jádro (Proof of Concept) s následujícími vlastnost
 └── trojuhelnikctverec.txt
 ```
 
+mame pripraveny data pro databazi 
+CEO (1)
+
+├─ Oddělení 1: Obchod (3)
+│  ├─ Head of Sales (manažer)
+│  ├─ Sales Rep A
+│  └─ Sales Rep B
+│
+├─ Oddělení 2: Produkt & IT (3)
+│  ├─ Head of Product/IT (manažer)
+│  ├─ Developer / Engineer
+│  └─ QA / Analyst
+│
+└─ Oddělení 3: Finance & HR (3)
+   ├─ Head of Finance/HR (manažer)
+   ├─ Accountant
+   └─ HR Generalist
 ## 5. Jak Aplikaci Spustit
 
 1.  Otevřete terminál v kořenovém adresáři projektu (`/Users/tonda/work/organomphp`).
@@ -127,20 +144,3 @@ Nyní je dokončena fáze rozšíření modelu cílů a implementace reportingu.
 
 ---
 
-pojdme udelat imaginarni organizaci se 3mi oddelenimi dohromady 10 lidi i s CEO 
-CEO (1)
-
-├─ Oddělení 1: Obchod (3)
-│  ├─ Head of Sales (manažer)
-│  ├─ Sales Rep A
-│  └─ Sales Rep B
-│
-├─ Oddělení 2: Produkt & IT (3)
-│  ├─ Head of Product/IT (manažer)
-│  ├─ Developer / Engineer
-│  └─ QA / Analyst
-│
-└─ Oddělení 3: Finance & HR (3)
-   ├─ Head of Finance/HR (manažer)
-   ├─ Accountant
-   └─ HR Generalist

@@ -79,24 +79,34 @@ class UserRepository
 
         try {
             $userId = $data['id'] ?? null;
+            $isAdmin = isset($data['is_admin']) ? 1 : 0;
 
             // Step 1: Insert or Update the user in the 'users' table
             if ($userId) { // Update existing user
+                $params = [
+                    $data['username'],
+                    $data['full_name'],
+                    $data['email'],
+                    $isAdmin,
+                ];
+
                 if (!empty($data['password'])) {
                     $passwordHash = password_hash($data['password'], PASSWORD_DEFAULT);
-                    $sql = "UPDATE users SET username = ?, full_name = ?, email = ?, password_hash = ? WHERE id = ?";
-                    $stmt = $this->pdo->prepare($sql);
-                    $stmt->execute([$data['username'], $data['full_name'], $data['email'], $passwordHash, $userId]);
+                    $sql = "UPDATE users SET username = ?, full_name = ?, email = ?, is_admin = ?, password_hash = ? WHERE id = ?";
+                    $params[] = $passwordHash;
                 } else {
-                    $sql = "UPDATE users SET username = ?, full_name = ?, email = ? WHERE id = ?";
-                    $stmt = $this->pdo->prepare($sql);
-                    $stmt->execute([$data['username'], $data['full_name'], $data['email'], $userId]);
+                    $sql = "UPDATE users SET username = ?, full_name = ?, email = ?, is_admin = ? WHERE id = ?";
                 }
+                $params[] = $userId;
+                
+                $stmt = $this->pdo->prepare($sql);
+                $stmt->execute($params);
+
             } else { // Create new user
                 $passwordHash = password_hash($data['password'] ?? 'password', PASSWORD_DEFAULT); // Default password if not set
-                $sql = "INSERT INTO users (username, full_name, email, password_hash) VALUES (?, ?, ?, ?)";
+                $sql = "INSERT INTO users (username, full_name, email, is_admin, password_hash) VALUES (?, ?, ?, ?, ?)";
                 $stmt = $this->pdo->prepare($sql);
-                $stmt->execute([$data['username'], $data['full_name'], $data['email'], $passwordHash]);
+                $stmt->execute([$data['username'], $data['full_name'], $data['email'], $isAdmin, $passwordHash]);
                 $userId = $this->pdo->lastInsertId();
             }
 
@@ -104,7 +114,6 @@ class UserRepository
             $newDeptId = $data['department_id'] ?? null;
 
             // First, unconditionally remove all existing assignments for the user.
-            // This robustly handles the case where a user should become unassigned.
             $this->pdo->prepare("DELETE FROM user_departments WHERE user_id = ?")->execute([$userId]);
 
             // If a new, valid department ID was provided, insert the new assignment.

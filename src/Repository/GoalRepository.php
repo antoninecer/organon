@@ -121,4 +121,40 @@ class GoalRepository
         $stmt->execute([':assigneeId' => $assigneeId]);
         return $stmt->fetchAll();
     }
+
+    /**
+     * Find all goals created by a specific manager.
+     * @param int $managerId
+     * @return array
+     */
+    public function findByManager(int $managerId): array
+    {
+        $sql = "
+            SELECT
+                g.*,
+                assignee.full_name as assignee_name,
+                manager.full_name as manager_name
+            FROM goals g
+            LEFT JOIN users assignee ON g.assignee_id = assignee.id
+            LEFT JOIN users manager ON g.manager_id = manager.id
+            WHERE g.manager_id = :managerId
+            ORDER BY g.due_date DESC, g.created_at DESC
+        ";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([':managerId' => $managerId]);
+        return $stmt->fetchAll();
+    }
+    
+    /**
+     * Update the status of a single goal.
+     * @param int $id
+     * @param string $status
+     * @return bool
+     */
+    public function updateStatus(int $id, string $status): bool
+    {
+        $sql = "UPDATE goals SET status = ? WHERE id = ?";
+        $stmt = $this->pdo->prepare($sql);
+        return $stmt->execute([$status, $id]);
+    }
 }

@@ -10,16 +10,15 @@
  * @param DepartmentRepository $departmentRepo
  * @return bool True if uploader is an ancestor or admin, false otherwise.
  */
-function is_ancestor_manager(int $uploaderId, int $assigneeId, UserRepository $userRepo, DepartmentRepository $departmentRepo): bool
+function is_ancestor_manager(int $uploaderId, int $assigneeId, UserRepository $userRepo, DepartmentRepository $departmentRepo, Auth $auth): bool
 {
-    // 1. Self-assignment is always allowed
-    if ($uploaderId === $assigneeId) {
+    // 1. Admin users have universal permission
+    if ($auth->isAdmin()) {
         return true;
     }
 
-    // 2. Admin user (ID 1) has universal permission
-    // Assuming admin user has ID 1. Adjust if your admin user has a different ID.
-    if ($uploaderId === 1) { 
+    // 2. Self-assignment is always allowed
+    if ($uploaderId === $assigneeId) {
         return true;
     }
 
@@ -28,7 +27,7 @@ function is_ancestor_manager(int $uploaderId, int $assigneeId, UserRepository $u
     $assigneeUser = $userRepo->find($assigneeId); // This returns user with department_ids
     if (!$assigneeUser || empty($assigneeUser['department_ids'])) {
         // Assignee not found or not assigned to any department.
-        // If they are unassigned, only admin can assign to them, or self-assign (already handled).
+        // If they are unassigned, only admin can assign to them (already handled), or self-assign (already handled).
         return false;
     }
 
