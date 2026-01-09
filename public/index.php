@@ -15,6 +15,7 @@ require_once __DIR__ . '/../src/Repository/ActionItemRepository.php';
 require_once __DIR__ . '/../src/Repository/RecognitionRepository.php';
 require_once __DIR__ . '/../src/Repository/GoalReportRepository.php';
 require_once __DIR__ . '/../src/Repository/OneOnOneNoteRepository.php';
+require_once __DIR__ . '/../src/Repository/ReviewRepository.php';
 
 require_once __DIR__ . '/../src/Helpers/GoalPermissions.php';
 
@@ -26,6 +27,7 @@ $actionItemRepo = new ActionItemRepository();
 $recognitionRepo = new RecognitionRepository();
 $goalReportRepo = new GoalReportRepository();
 $oneOnOneNoteRepo = new OneOnOneNoteRepository();
+$reviewRepo = new ReviewRepository();
 
 /**
  * Redirects user to dashboard with an "Unauthorized" error message.
@@ -304,6 +306,67 @@ if ($action === 'delete_one_on_one_note' && $_SERVER['REQUEST_METHOD'] === 'POST
     exit;
 }
 
+// Review Actions
+if ($action === 'start_review' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    $managerId = $auth->id();
+    $userId = (int)$_POST['user_id'];
+    $reviewPeriod = $_POST['review_period'];
+
+    // Security Check: Ensure the person starting the review is a manager of the user being reviewed
+    if (!is_ancestor_manager($managerId, $userId, $userRepo, $departmentRepo, $auth)) {
+        $_SESSION['error_message'] = 'Nemáte oprávnění zahájit hodnocení pro tohoto uživatele.';
+        header('Location: index.php?page=reviews');
+        exit;
+    }
+
+    $reviewId = $reviewRepo->save([
+        'user_id' => $userId,
+        'manager_id' => $managerId,
+        'review_period' => $reviewPeriod
+    ]);
+
+    if ($reviewId) {
+        header('Location: index.php?page=review_detail&id=' . $reviewId);
+    } else {
+        $_SESSION['error_message'] = 'Nepodařilo se zahájit hodnocení.';
+        header('Location: index.php?page=reviews');
+    }
+    exit;
+}
+
+if ($action === 'save_review' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    $reviewId = (int)$_POST['review_id'];
+    $review = $reviewRepo->find($reviewId);
+
+    // Security Check: ensure the user is the manager for this review
+    if (!$review || $review['manager_id'] !== $auth->id()) {
+        _unauthorized();
+    }
+    
+    // Determine if we are finalizing or just saving a draft
+    $status = isset($_POST['finalize']) ? 'finalized' : 'draft';
+
+    $data = [
+        'id' => $reviewId,
+        'strengths_summary' => $_POST['strengths_summary'],
+        'weaknesses_summary' => $_POST['weaknesses_summary'],
+        'development_plan' => $_POST['development_plan'],
+        'final_rating' => (int)$_POST['final_rating'],
+        'status' => $status,
+        'goals' => $_POST['goals'] ?? [],
+        'action_items' => $_POST['action_items'] ?? [],
+        'recognitions' => $_POST['recognitions'] ?? []
+    ];
+    
+    if ($reviewRepo->save($data)) {
+        $_SESSION['success_message'] = 'Hodnocení bylo uloženo.';
+    } else {
+        $_SESSION['error_message'] = 'Chyba při ukládání hodnocení.';
+    }
+    header('Location: index.php?page=reviews');
+    exit;
+}
+
 
 // --- Page Routing & Security ---
 $page = $_GET['page'] ?? 'dashboard';
@@ -353,6 +416,14 @@ switch ($page) {
         include __DIR__ . '/../templates/recognitions.php';
         break;
     
+    case 'reviews':
+        include __DIR__ . '/../templates/reviews.php';
+        break;
+
+    case 'review_detail':
+        include __DIR__ . '/../templates/review_detail.php';
+        break;
+
     case 'departments':
         include __DIR__ . '/../templates/departments.php';
         break;

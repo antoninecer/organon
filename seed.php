@@ -162,6 +162,48 @@ try {
 
     echo "[SUCCESS] Sample data seeded.\n";
 
+    // 8. Seed Generic Goals and Tasks for All Users
+    echo "[INFO] Seeding generic goals and tasks for all non-manager users...\n";
+    $stmt = $pdo->query("SELECT id, manager_id FROM departments");
+    $departments = $stmt->fetchAll(PDO::FETCH_KEY_PAIR); // Map of [dept_id => manager_id]
+
+    $userDepartmentsStmt = $pdo->prepare("SELECT department_id FROM user_departments WHERE user_id = ?");
+
+    foreach ($usersData as $ud) {
+        // Skip admins and managers for this generic seeding
+        if ($ud['is_admin'] || $ud['is_manager_of']) {
+            continue;
+        }
+
+        $userId = $userIds[$ud['username']];
+        
+        // Find user's department and manager
+        $userDepartmentsStmt->execute([$userId]);
+        $userDeptId = $userDepartmentsStmt->fetchColumn();
+
+        if ($userDeptId && isset($departments[$userDeptId])) {
+            $managerId = $departments[$userDeptId];
+            if ($managerId) {
+                 // Don't add if the user is the manager of their own department (e.g. CEO)
+                if ($userId === $managerId) continue;
+
+                // Add a generic goal
+                $goalStmt->execute([
+                    'Standardní cíl pro ' . $ud['full_name'],
+                    'Toto je obecný cíl pro demonstrační účely.',
+                    $userId, $managerId, 'new', date('Y-m-d', strtotime('+3 month')), 'boolean', 1, 1, 'exact', 'manual'
+                ]);
+
+                // Add a generic action item
+                $actionItemStmt->execute([
+                    'Standardní úkol pro ' . $ud['full_name'],
+                    $userId, $managerId, date('Y-m-d', strtotime('+1 week')), 'new', 'Toto je obecný úkol pro demonstrační účely.'
+                ]);
+            }
+        }
+    }
+     echo "[SUCCESS] Generic data seeded.\n";
+
 
 } catch (PDOException | Exception $e) {
     die("\n[ERROR] An error occurred: " . $e->getMessage() . "\n");

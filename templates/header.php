@@ -31,6 +31,7 @@ $user = $auth->user();
             <li><a href="index.php?page=goals">Cíle</a></li>
             <li><a href="index.php?page=action_items">Úkoly</a></li>
             <li><a href="index.php?page=recognitions">Pochvaly</a></li>
+            <li><a href="index.php?page=reviews">Hodnocení</a></li>
             <?php if ($auth->isAdmin()): ?>
                 <li><a href="index.php?page=departments">Oddělení</a></li>
                 <li><a href="index.php?page=users">Uživatelé</a></li>

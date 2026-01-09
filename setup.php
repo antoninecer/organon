@@ -113,7 +113,33 @@ try {
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             FOREIGN KEY (manager_id) REFERENCES users(id) ON DELETE CASCADE,
             FOREIGN KEY (subordinate_id) REFERENCES users(id) ON DELETE CASCADE
-        );"
+        );",
+
+        // Reviews table for annual/quarterly performance reviews
+        "CREATE TABLE IF NOT EXISTS reviews (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER NOT NULL,
+            manager_id INTEGER NOT NULL,
+            review_period TEXT NOT NULL,
+            status TEXT NOT NULL DEFAULT 'draft', -- 'draft', 'finalized'
+            strengths_summary TEXT,
+            weaknesses_summary TEXT,
+            development_plan TEXT,
+            final_rating INTEGER, -- e.g., 1-5 scale
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            finalized_at TIMESTAMP,
+            FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+            FOREIGN KEY (manager_id) REFERENCES users(id) ON DELETE CASCADE
+        );",
+
+        // Junction table to link reviews to specific items (goals, action items, etc.)
+        "CREATE TABLE IF NOT EXISTS review_items (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            review_id INTEGER NOT NULL,
+            item_id INTEGER NOT NULL,
+            item_type TEXT NOT NULL, -- 'goal', 'action_item', 'recognition'
+            FOREIGN KEY (review_id) REFERENCES reviews(id) ON DELETE CASCADE
+        )"
     ];
 
     foreach ($commands as $command) {
