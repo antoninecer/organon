@@ -310,11 +310,19 @@ if ($action === 'delete_one_on_one_note' && $_SERVER['REQUEST_METHOD'] === 'POST
 if ($action === 'start_review' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     $managerId = $auth->id();
     $userId = (int)$_POST['user_id'];
-    $reviewPeriod = $_POST['review_period'];
+    $reviewPeriod = trim($_POST['review_period']);
 
     // Security Check: Ensure the person starting the review is a manager of the user being reviewed
     if (!is_ancestor_manager($managerId, $userId, $userRepo, $departmentRepo, $auth)) {
         $_SESSION['error_message'] = 'Nemáte oprávnění zahájit hodnocení pro tohoto uživatele.';
+        header('Location: index.php?page=reviews');
+        exit;
+    }
+
+    // Duplicate Check
+    $existing = $reviewRepo->findByUserAndPeriod($userId, $reviewPeriod);
+    if ($existing) {
+        $_SESSION['error_message'] = 'Hodnocení pro tohoto uživatele a období již existuje.';
         header('Location: index.php?page=reviews');
         exit;
     }

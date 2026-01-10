@@ -98,6 +98,7 @@ $assignableUsers = $userRepo->findAllSubordinates($currentUserId);
                         <tr><td colspan="4">Zatím jste nevytvořili žádné hodnocení.</td></tr>
                     <?php else: ?>
                         <?php foreach ($teamReviews as $review): ?>
+                            <?php if ($review['user_id'] === $currentUserId) continue; // Don't show self-reviews in the team list ?>
                             <tr>
                                 <td><strong><?= htmlspecialchars($review['user_name']) ?></strong></td>
                                 <td><?= htmlspecialchars($review['review_period']) ?></td>

@@ -164,4 +164,17 @@ class ReviewRepository
         }
         return $items;
     }
+
+    /**
+     * Find a review by user and period to prevent duplicates.
+     * @param int $userId
+     * @param string $reviewPeriod
+     * @return mixed
+     */
+    public function findByUserAndPeriod(int $userId, string $reviewPeriod)
+    {
+        $stmt = $this->pdo->prepare("SELECT * FROM reviews WHERE user_id = ? AND review_period = ?");
+        $stmt->execute([$userId, $reviewPeriod]);
+        return $stmt->fetch();
+    }
 }
